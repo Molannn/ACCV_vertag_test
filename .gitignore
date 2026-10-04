@@ -222,7 +222,11 @@ LETITBE/data/
 LETITBE/models/
 LETITBE/**/checkpoint-*/
 LETITBE/**/*.safetensors
+LETITBE/results*.jsonl
 .DS_Store
+
+# one environment per component (README FAQ): .venv-fade, .venv-explainer, .venv-letitbe
+.venv*/
 
 # FADE / explainer: weights, images and run outputs stay out of the repository
 *.pt
