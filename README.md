@@ -173,6 +173,7 @@ Each model's PCA whitening is fitted on a random gallery sample that depends on 
 It is a gated model: accept the Gemma Terms of Use on [its Hugging Face page](https://huggingface.co/google/gemma-2-9b-it) and set `HF_TOKEN` (see [`LETITBE/.env.example`](LETITBE/.env.example)). The Breeze base model is not gated.
 
 </details>
+
 ## Citation
 
 ```bibtex
