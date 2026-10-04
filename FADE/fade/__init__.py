@@ -9,12 +9,12 @@ C_ij of the retrieval score, retrieval / evaluation utilities and visualisation.
 """
 from .backbones import REGISTRY, BackboneSpec, load_backbone
 from .correspondence import Correspondence, region_name
-from .model import FADE, AttnPool, load_fade, read_checkpoint, trainable_keys
+from .model import FADE, AttnPool, checkpoint_config, load_fade, read_checkpoint, trainable_keys
 from .transforms import build_ar_preprocessor, build_transform
 
 __all__ = [
     "REGISTRY", "BackboneSpec", "load_backbone",
-    "FADE", "AttnPool", "load_fade", "read_checkpoint", "trainable_keys",
+    "FADE", "AttnPool", "checkpoint_config", "load_fade", "read_checkpoint", "trainable_keys",
     "Correspondence", "region_name",
     "build_ar_preprocessor", "build_transform",
 ]

@@ -12,8 +12,8 @@ no office-action text, no personal data.
 | `gallery_regnos.txt` | 83,336 | The retrieval gallery: one prior-mark registration number per line. |
 | `query_apply_no.csv` | 10,215 | `case_id, apply_no`: the TIPO application number of each query's applied mark, in the order of `qrels_test.csv`. |
 
-`case_id` is the TIPO examination number of the refusal (office action), not the number of the applied
-mark itself; `query_apply_no.csv` maps it to the mark's application number. Each registration number
+`case_id` is the TIPO rejection-decision (disposition) number of the office action (`T` + 7 digits), not
+the number of the applied mark itself; `query_apply_no.csv` maps it to the mark's application number. Each registration number
 identifies one prior registered mark. The G2 (~1M-distractor) variant additionally injects the METU-v2
 gallery; see the paper.
 
@@ -30,8 +30,8 @@ official trademark search system** (the government's public trademark register, 
 
 TIPO also publishes trademark data, including mark images, through its patent and trademark open data
 service (專利商標開放資料, under 公開資訊 on [tiponet.tipo.gov.tw](https://tiponet.tipo.gov.tw)), which
-offers API access; follow its terms of use. No bulk collection tooling is provided here — the identifiers
-let you retrieve exactly the marks the benchmark uses.
+offers API access; follow its terms of use. No images or collection tools are provided here. Reproducing G1 requires all 83,336 gallery images
+and the 10,215 query images; obtain them in accordance with TIPO's terms of use.
 
 ## Evaluation
 
@@ -40,8 +40,15 @@ mark, then score against `cited_regnos`. Primary metrics are Recall@100 and PRES
 listed for a query are treated as **unjudged**, never as negatives (office actions under-cite). See the
 paper (Section 4) for the full protocol, the year-based split, and the G1/G2 galleries.
 
-A reference implementation that scores the frozen baselines and FADE on G1 and G2 is
-[`../FADE/evaluate.py`](../FADE/README.md#5-evaluate-on-the-examiner-confusion-benchmark).
+To score any model, write its rankings as a CSV with the columns `case_id, rank, regno` (rank 1 = most
+similar; a list may be truncated, e.g. to the top 1000) and run
+
+    python score_run.py --run my_run.csv
+
+It reports Recall@100, PRES@100 and mAP@100 over all 10,215 queries; a cited mark missing from a list counts
+as ranked beyond the cutoff, and a query missing from the file as a miss. `score_run.py` uses the metric
+functions of [`../FADE`](../FADE/) (install `../FADE/requirements.txt`). To evaluate FADE itself, encoding
+the images and scoring G1 and G2, use [`../FADE/evaluate.py`](../FADE/README.md#5-evaluate-on-the-examiner-confusion-benchmark).
 
 ## License
 

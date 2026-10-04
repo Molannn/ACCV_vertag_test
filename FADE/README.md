@@ -8,18 +8,22 @@ $$
 s(A,B)=\hat d_A\cdot\hat d_B=\sum_{i,j}\frac{a_i^A a_j^B\,(v_i^A\cdot v_j^B)}{\lVert d_A\rVert\,\lVert d_B\rVert}=\sum_{i,j}C_{ij}
 $$
 
-$C_{ij}$ needs no argmax, assignment step or separate matcher: the contributions sum to the score itself, and on held-out office actions they localize the element the examiner names. This directory contains inference and evaluation code; the training code is not released.
+$C_{ij}$ needs no argmax, assignment step or separate matcher: the contributions sum to the score itself. With the code here you can
+
+- search a gallery for marks similar to a query mark (`retrieve.py`),
+- explain why two marks are similar with $C_{ij}$ (`explain.py`),
+- evaluate retrieval on the examiner-confusion benchmark (`evaluate.py`).
+
+The training code is not released.
 
 ## Contents
 
 ```
 FADE/
 ├── fade/                    library: backbones, FADE head + checkpoint loading, C_ij, metrics, rendering
-├── explain.py               C_ij explanation of mark pairs: figure, JSON record, evidence for ../explainer
 ├── retrieve.py              rank a gallery for query marks and explain the top hits
-├── evaluate.py              examiner-confusion benchmark, G1 and G2 (Tab. 3, Tab. 4)
-├── evaluate_metu.py         METU-v2 near-duplicate benchmark (Tab. 3)
-├── export_checkpoint.py     training checkpoint (.pt) -> release file (.safetensors)
+├── explain.py               C_ij explanation of mark pairs: figure, JSON record, evidence for ../explainer
+├── evaluate.py              retrieval on the examiner-confusion benchmark (G1, optionally G2)
 ├── requirements.txt
 └── examples/
     └── pairs.example.jsonl  input format of --pairs (identifiers from ../benchmark)
@@ -34,16 +38,39 @@ cd FADE
 pip install -r requirements.txt
 ```
 
-The pretrained backbones are downloaded on first use: DINOv2 from `torch.hub` (`facebookresearch/dinov2`), SigLIP from Hugging Face (`google/siglip-so400m-patch14-224`).
+The frozen parts of the backbones are downloaded from their official sources on first use: DINOv2 from `torch.hub` (`facebookresearch/dinov2`), SigLIP from Hugging Face (`google/siglip-so400m-patch14-224`).
 
-## 2. Checkpoints
+## 2. Models
 
-| Model | Backbone | File | Download |
+| File | Backbone | Use it for | G1 R@100 |
 |---|---|---|---|
-| FADE (main model) | DINOv2-L/14-reg, 224 px | `fade_dinov2_vitl14_reg.safetensors` | coming soon |
-| FADE | SigLIP-SO400M/14, 224 px | `fade_siglip_so400m.safetensors` | coming soon |
+| `fade_siglip_so400m.safetensors` | SigLIP-SO400M/14, 224 px | **retrieval**: the strongest retriever in the paper (Tab. 4) | 0.609 |
+| `fade_dinov2_vitl14_reg.safetensors` | DINOv2-L/14 with registers, 224 px | the model analysed in the paper (Tab. 3, Fig. 3) and the source of the explainer's region evidence | 0.146 |
 
-Put the files in `FADE/checkpoints/`. A release file stores only what training changed (the last two transformer blocks, the backbone's final norm and the FADE head); the frozen pretrained backbone is downloaded from its public source and the trained tensors are loaded on top of it. `load_fade` also reads full training checkpoints (`.pt`).
+Both expose the exact $C_{ij}$ decomposition. The retrieval and evaluation examples below use `fade_siglip_so400m`; the explanation examples use `fade_dinov2_vitl14_reg`, the model behind the paper's figures. Either checkpoint works with every script.
+
+**Download** from [Google Drive](https://drive.google.com/drive/folders/1R6ZYEtCIhNd7nCeh-1Wq9oB0FwGDDels?usp=sharing), in the browser or with `gdown` (this fetches the explainer adapters too), and put the two files in `FADE/checkpoints/`:
+
+```bash
+pip install "gdown>=6.4,<7"
+gdown --folder https://drive.google.com/drive/folders/1R6ZYEtCIhNd7nCeh-1Wq9oB0FwGDDels -O vertag_models
+(cd vertag_models && sha256sum -c SHA256SUMS)
+mkdir -p checkpoints && cp vertag_models/FADE/*.safetensors checkpoints/
+```
+
+| File | SHA256 |
+|---|---|
+| `FADE/fade_dinov2_vitl14_reg.safetensors` | `41702efeaa7ec5dc2350173996aefd6ef2805ef063e2af45f72417dcc3eadce6` |
+| `FADE/fade_siglip_so400m.safetensors` | `d03b6aa280503a20947d8762dca2a1dbd946a54bdd2eef2c9515f0881e0a1a05` |
+
+The downloaded folder includes `SHA256SUMS` and its license files (`LICENSE.txt`, `LICENSE-APACHE-2.0.txt`).
+
+**Model card.**
+
+- *Source.* These are the paper's models, not retrained ones. Each file is a slim export of the paper's checkpoint: it stores only the tensors training changed, and every tensor was checked against the original checkpoint when it was exported.
+- *Architecture.* Only the last two transformer blocks, the backbone's final norm and the FADE head were trained. The file stores these tensors; the rest of the backbone is loaded from the official pretrained weights.
+- *Training data.* METU-v2 copy-detection pairs (its 417 queries excluded) mixed with examiner pairs (applied mark → cited mark) from TIPO office actions published up to 2023. The benchmark queries are the office actions after 2023. Evaluation on METU-v2 is therefore **not zero-shot**. Some prior marks cited against benchmark queries also occur in the training pairs; the paper reports the effect (Suppl. S1).
+- *License.* CC BY-NC 4.0, see [License](#license).
 
 ## 3. Explain a pair
 
@@ -60,7 +87,7 @@ python explain.py --checkpoint checkpoints/fade_dinov2_vitl14_reg.safetensors \
     --evidence-out outputs/explain/evidence.json
 ```
 
-`--evidence-out` also writes the region evidence (correspondence text and matched region crops) that the grounded explainer reads; see [`../explainer`](../explainer/).
+`--evidence-out` also writes the region evidence (correspondence text and matched region crops, stored next to the index) that `../explainer/generate.py --evidence` reads. The explainer can also compute this evidence itself; see [`../explainer`](../explainer/).
 
 From Python:
 
@@ -79,7 +106,7 @@ $C_{ij}$ decomposes the cosine of the two FADE descriptors. Retrieval rankings (
 ## 4. Retrieve
 
 ```bash
-python retrieve.py --checkpoint checkpoints/fade_dinov2_vitl14_reg.safetensors \
+python retrieve.py --checkpoint checkpoints/fade_siglip_so400m.safetensors \
     --gallery /path/to/gallery_dir --query query.jpg --topk 10 --explain 3
 ```
 
@@ -98,63 +125,30 @@ The labels are in [`../benchmark`](../benchmark/); the mark images are not redis
 (any common image format; the file stem is the identifier). Then
 
 ```bash
-# G1, frozen DINOv2-L/14-reg GeM vs FADE (Tab. 3)
-python evaluate.py --checkpoint checkpoints/fade_dinov2_vitl14_reg.safetensors \
-    --images /path/to/images --output outputs/g1_dinov2.json
-
-# G1, frozen SigLIP vs FADE (Tab. 4)
-python evaluate.py --checkpoint checkpoints/fade_siglip_so400m.safetensors --backbone siglip_so400m_224 \
+# G1: frozen GeM baseline of the same backbone vs FADE
+python evaluate.py --checkpoint checkpoints/fade_siglip_so400m.safetensors \
     --images /path/to/images --output outputs/g1_siglip.json
 
-# G2: --g2-metu injects the register into the METU-v2 gallery (a few GPU hours per model)
+# G2: also inject the register into the METU-v2 gallery (a few GPU hours per model)
 python evaluate.py --checkpoint checkpoints/fade_dinov2_vitl14_reg.safetensors \
     --images /path/to/images --g2-metu /path/to/METU/930k_logo_v3 --output outputs/g2_dinov2.json
-
-# frozen baselines of Tab. 4 (EVA02-CLIP also needs: pip install open-clip-torch)
-python evaluate.py --backbone dinov2_vitb14 --images /path/to/images --output outputs/g1_dinov2_b14.json
-python evaluate.py --backbone eva02_clip_l14 --images /path/to/images --output outputs/g1_eva02.json
 ```
 
-A run scores the frozen GeM baseline of `--backbone` first and the checkpoint second, and prints R@100 and PRES@100 (primary), mAP@100, R@1, R@10, NAR and the FADE − frozen differences. `--dump-per-query` saves aligned per-query metrics for paired bootstrap intervals. The paper reports:
+A run scores the frozen GeM baseline of the checkpoint's backbone first and the checkpoint second, and prints R@100 and PRES@100 (primary), mAP@100, R@1, R@10, NAR and the FADE − frozen differences. METU-v2 ([Tursun et al., 2017](https://github.com/neouyghur/METU-TRADEMARK-DATASET)) is available from its authors on request. The paper reports:
 
 | Model | G1 mAP@100 | G1 R@100 | G1 PRES@100 | G2 R@100 |
 |---|---|---|---|---|
-| DINOv2-B/14 (frozen) | 0.028 | 0.080 | 0.054 | – |
 | DINOv2-L/14-reg GeM (frozen) | 0.026 | 0.079 | 0.054 | 0.063 |
-| EVA02-CLIP-L/14 (frozen) | 0.173 | 0.445 | 0.330 | – |
-| SigLIP-SO400M (frozen) | 0.220 | 0.512 | 0.393 | 0.385 |
 | DINOv2-L + FADE | 0.048 | 0.146 | 0.093 | 0.123 |
+| SigLIP-SO400M (frozen) | 0.220 | 0.512 | 0.393 | 0.385 |
 | SigLIP + FADE | **0.319** | **0.609** | **0.500** | **0.548** |
 
-G1 is the 83,336-mark register and G2 the register plus the 922,926 METU-v2 images (1,006,262), both with 10,215 queries.
+G1 is the 83,336-mark register and G2 the register plus the 922,926 METU-v2 images (1,006,262), both with 10,215 queries. To score rankings from any other model, see [`../benchmark/score_run.py`](../benchmark/README.md#evaluation).
 
 Each model's PCA whitening is fitted on a random sample of 20,000 gallery descriptors drawn from the seeded global RNG, so the sample depends on everything a run did before: whether a checkpoint is given, and whether G2 is scored. The commands above follow the runs behind the paper's numbers: G1 columns from G1-only runs, G2 columns from `--g2-metu` runs (which re-score G1 with a different sample), and the frozen DINOv2-L/14-reg and SigLIP rows from the runs of their FADE checkpoints. A different sequence moves the values by about 0.001; the frozen SigLIP baseline, for example, reaches R@100 0.511 when evaluated alone and 0.512 next to its FADE checkpoint. Images collected separately from TIPO can also differ in encoding from those used in the paper.
-
-## 6. Evaluate on METU-v2
-
-METU-v2 ([dataset page](https://github.com/neouyghur/METU-TRADEMARK-DATASET)) is available from its authors on request; cite both [Tursun and Kalkan, MVA 2015](https://doi.org/10.1109/MVA.2015.7153243) and [Tursun et al., arXiv:1701.05766](https://arxiv.org/abs/1701.05766) when you use it.
-
-```bash
-python evaluate_metu.py --checkpoint checkpoints/fade_dinov2_vitl14_reg.safetensors \
-    --gallery-dir /path/to/METU/930k_logo_v3 --query-dir /path/to/METU/new_queryset_allinone \
-    --output outputs/metu_dinov2.json
-```
-
-The 417 queries are injected after the 922,926 gallery images, and a query's relevant set is the other queries of its group (file name `<instance>-<group>.jpg`). The run scores the frozen GeM baseline of the checkpoint's backbone and the checkpoint. The paper reports mAP@100 0.300 → 0.316 for DINOv2-L/14-reg on the full gallery (Tab. 3) and 0.639 → 0.641 for SigLIP-SO400M on the seeded 50k gallery subset (Suppl. Tab. S3; frozen → FADE). `--pool 50000` evaluates on that 50k subset, and `--content-types logo_content_types.txt` adds a per-type breakdown.
-
-## 7. Checkpoint format
-
-`export_checkpoint.py` turns a training checkpoint into a release file:
-
-```bash
-python export_checkpoint.py --checkpoint fade_dinov2_training.pt \
-    --output checkpoints/fade_dinov2_vitl14_reg.safetensors
-```
-
-It stores the config in the safetensors metadata, keeps only the trained tensors after checking that every other tensor is bit-identical to the public pretrained backbone (`--full` keeps everything), and then reloads the file and compares all tensors with the source checkpoint.
 
 ---
 
 ## License
 
-See the [root README](../README.md). The code is MIT-licensed. The released checkpoints are derived from DINOv2 and SigLIP and are subject to their terms as well.
+See the [root README](../README.md). The code is MIT-licensed. The released FADE weights are licensed under CC BY-NC 4.0 (non-commercial use with attribution; cite the paper), the same as the data artifacts. They are derived from DINOv2 and `google/siglip-so400m-patch14-224`, both under the Apache License 2.0, and the derived parts remain subject to those licenses.
