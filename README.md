@@ -173,6 +173,7 @@ Each model's PCA whitening is fitted on a random gallery sample that depends on 
 It is a gated model: accept the Gemma Terms of Use on [its Hugging Face page](https://huggingface.co/google/gemma-2-9b-it) and set `HF_TOKEN` (see [`LETITBE/.env.example`](LETITBE/.env.example)). The Breeze base model is not gated.
 
 </details>
+
 ## Citation
 
 ```bibtex
@@ -186,7 +187,7 @@ It is a gated model: accept the Gemma Terms of Use on [its Hugging Face page](ht
 
 ## Acknowledgements
 
-This release builds on [DINOv2](https://github.com/facebookresearch/dinov2), [SigLIP](https://huggingface.co/google/siglip-so400m-patch14-224), [Qwen2.5-VL](https://huggingface.co/Qwen/Qwen2.5-VL-7B-Instruct) and [PEFT](https://github.com/huggingface/peft), and evaluates on [METU-v2](https://github.com/neouyghur/METU-TRADEMARK-DATASET).
+This release builds on [DINOv2](https://github.com/facebookresearch/dinov2), [SigLIP](https://huggingface.co/google/siglip-so400m-patch14-224), [Qwen2.5-VL](https://huggingface.co/Qwen/Qwen2.5-VL-7B-Instruct), [Qwen2.5](https://huggingface.co/Qwen/Qwen2.5-7B-Instruct), [Gemma 2](https://huggingface.co/google/gemma-2-9b-it), [Breeze-7B](https://huggingface.co/MediaTek-Research/Breeze-7B-Instruct-v1_0), [PEFT](https://github.com/huggingface/peft) and [Ollama](https://ollama.com), and evaluates on [METU-v2](https://github.com/neouyghur/METU-TRADEMARK-DATASET).
 
 ## Contact
 
