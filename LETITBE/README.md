@@ -11,7 +11,7 @@ LETITBE scores a candidate explanation of trademark similarity against the reaso
 ```
 LETITBE/
 ├── letitbe.py                     score explanations, evaluate a detector
-├── preprocess.py                  office actions -> reason points -> training pairs
+├── preprocess.py                  appearance paragraphs -> reason points -> training pairs
 ├── finetune.py                    QLoRA fine-tune a detector
 ├── PROMPTS.md                     both prompts verbatim, and why they are specification
 ├── requirements.txt
@@ -91,7 +91,7 @@ It reads only the gold reason points; the `cand` field is ignored.
 
 Use the prompt in [`PROMPTS.md`](PROMPTS.md) verbatim; do not translate or paraphrase it.
 
-The released adapters are per-point **classifiers**, not coverage engines; they fail the boilerplate criterion above. Load one with `--backend hf` under the `detector` subcommand:
+The released adapters, listed in the root README's [Model Zoo](../README.md#model-zoo), are per-point **classifiers**, not coverage engines; they fail the boilerplate criterion above. Load one with `--backend hf` under the `detector` subcommand:
 
 ```bash
 python letitbe.py detector --input your_pairs.jsonl \
@@ -100,7 +100,7 @@ python letitbe.py detector --input your_pairs.jsonl \
 
 `google/gemma-2-9b-it` is gated; accept its terms on Hugging Face and set `HF_TOKEN` first ([FAQ](../README.md#faq)).
 
-The released adapters are listed in the root README's [Model Zoo](../README.md#model-zoo). Each model card on Hugging Face carries the prompt format, measurements, training setup and license. An adapter is **not** covered by this repository's licenses: each inherits its base model's terms, and for `gemma-2-9b` that means the Gemma Terms of Use.
+Each model card on Hugging Face carries the prompt format, measurements, training setup and license. An adapter is **not** covered by this repository's licenses: each inherits its base model's terms, and for `gemma-2-9b` that means the Gemma Terms of Use.
 
 ## 5. Build the corpus yourself
 
