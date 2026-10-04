@@ -65,28 +65,21 @@ Install each component in its own Python 3.10 environment (see [FAQ](#faq)):
 
 | Component | Model | Base model | Paper | Download |
 |---|---|---|---|---|
-| FADE | `fade_siglip_so400m` (best retriever) | SigLIP-SO400M/14, 224 px | Tab. 4 | [Google Drive][models] |
-| FADE | `fade_dinov2_vitl14_reg` | DINOv2-L/14-reg, 224 px | Tab. 3, Tab. 4, Fig. 3 | [Google Drive][models] |
-| explainer | `explainer_lora` (default) | Qwen2.5-VL-7B-Instruct | Tab. 5 | [Google Drive][models] |
-| explainer | `explainer_lora_prompt_v0` | Qwen2.5-VL-7B-Instruct | Tab. 5, Suppl. S7 | [Google Drive][models] |
+| FADE | `fade_siglip_so400m` (best retriever) | SigLIP-SO400M/14, 224 px | Tab. 4 | [Hugging Face](https://huggingface.co/MrFrogIsMe/vertag-fade) |
+| FADE | `fade_dinov2_vitl14_reg` | DINOv2-L/14-reg, 224 px | Tab. 3, Tab. 4, Fig. 3 | [Hugging Face](https://huggingface.co/MrFrogIsMe/vertag-fade) |
+| explainer | `vertag-explainer-lora` (default) | Qwen2.5-VL-7B-Instruct | Tab. 5 | [Hugging Face](https://huggingface.co/MrFrogIsMe/vertag-explainer-lora) |
+| explainer | `vertag-explainer-lora-prompt-v0` | Qwen2.5-VL-7B-Instruct | Tab. 5, Suppl. S7 | [Hugging Face](https://huggingface.co/MrFrogIsMe/vertag-explainer-lora-prompt-v0) |
 | LETITBE | reference engine | Qwen2.5-7B-Instruct, zero-shot | Tab. 6 | via [Ollama](https://ollama.com) (`qwen2.5:7b`) |
 | LETITBE | `letitbe-hitdet-gemma2-9b` | gemma-2-9b-it | Tab. 6 | [Hugging Face](https://huggingface.co/annieyii/letitbe-hitdet-gemma2-9b) |
 | LETITBE | `letitbe-hitdet-breeze-7b` | Breeze-7B-Instruct-v1_0 | Suppl. Tab. S9 | [Hugging Face](https://huggingface.co/annieyii/letitbe-hitdet-breeze-7b) |
 
-[models]: https://drive.google.com/drive/folders/1R6ZYEtCIhNd7nCeh-1Wq9oB0FwGDDels?usp=sharing
-
-The FADE and explainer files are the models used in the paper. Download the folder in the browser or with `gdown`, check it against `SHA256SUMS`, and put the FADE files in `FADE/checkpoints/` and the adapter folders in `explainer/checkpoints/`:
+All released models are gathered in the [VERTAG collection on Hugging Face](https://huggingface.co/collections/MrFrogIsMe/vertag-accv-2026-6ac2a1b302d4f108b53aeba0). The FADE and explainer files are the models used in the paper. Download the FADE checkpoints into `FADE/checkpoints/` (the `hf` command comes with the requirements); the explainer takes an adapter's Hugging Face id directly:
 
 ```bash
-pip install "gdown>=6.4,<7"
-gdown --folder https://drive.google.com/drive/folders/1R6ZYEtCIhNd7nCeh-1Wq9oB0FwGDDels -O vertag_models
-(cd vertag_models && sha256sum -c SHA256SUMS)
-mkdir -p FADE/checkpoints explainer/checkpoints
-cp vertag_models/FADE/*.safetensors FADE/checkpoints/
-cp -r vertag_models/explainer/explainer_lora vertag_models/explainer/explainer_lora_prompt_v0 explainer/checkpoints/
+hf download MrFrogIsMe/vertag-fade --include "*.safetensors" --local-dir FADE/checkpoints
 ```
 
-The weights are licensed under CC BY-NC 4.0 and the downloaded folder includes the license files. Model cards (source, training data, architecture) are in [`FADE/README.md`](FADE/README.md#2-models) and [`explainer/README.md`](explainer/README.md#2-adapters).
+The weights are licensed under CC BY-NC 4.0, and each Hugging Face repository carries its license files. Model cards (source, training data, architecture) are on Hugging Face and in [`FADE/README.md`](FADE/README.md#2-models) and [`explainer/README.md`](explainer/README.md#2-adapters).
 
 ## Quick start
 
@@ -108,7 +101,7 @@ Rankings from any other model can be scored with [`benchmark/score_run.py`](benc
 ```bash
 cd explainer
 python generate.py --applied applied.jpg --cited cited.jpg --regno 00820591 \
-    --condition C --regno-evidence --adapter checkpoints/explainer_lora
+    --condition C --regno-evidence --adapter MrFrogIsMe/vertag-explainer-lora
 ```
 
 Without the registration number, the fine-tuned adapter writes a fabricated one into almost every rationale; FADE region evidence (`--fade-checkpoint`) does not improve the content of its rationales. The output is research text, not an examination opinion of TIPO and not legal advice.

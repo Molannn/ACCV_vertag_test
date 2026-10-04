@@ -49,21 +49,19 @@ The frozen parts of the backbones are downloaded from their official sources on 
 
 Both expose the exact $C_{ij}$ decomposition. The retrieval and evaluation examples below use `fade_siglip_so400m`; the explanation examples use `fade_dinov2_vitl14_reg`, the model behind the paper's figures. Either checkpoint works with every script.
 
-**Download** from [Google Drive](https://drive.google.com/drive/folders/1R6ZYEtCIhNd7nCeh-1Wq9oB0FwGDDels?usp=sharing), in the browser or with `gdown` (this fetches the explainer adapters too), and put the two files in `FADE/checkpoints/`:
+**Download** both files from [`MrFrogIsMe/vertag-fade`](https://huggingface.co/MrFrogIsMe/vertag-fade) on Hugging Face into `FADE/checkpoints/` (the `hf` command comes with the requirements):
 
 ```bash
-pip install "gdown>=6.4,<7"
-gdown --folder https://drive.google.com/drive/folders/1R6ZYEtCIhNd7nCeh-1Wq9oB0FwGDDels -O vertag_models
-(cd vertag_models && sha256sum -c SHA256SUMS)
-mkdir -p checkpoints && cp vertag_models/FADE/*.safetensors checkpoints/
+hf download MrFrogIsMe/vertag-fade --include "*.safetensors" --local-dir checkpoints
+sha256sum checkpoints/*.safetensors      # macOS: shasum -a 256
 ```
 
 | File | SHA256 |
 |---|---|
-| `FADE/fade_dinov2_vitl14_reg.safetensors` | `41702efeaa7ec5dc2350173996aefd6ef2805ef063e2af45f72417dcc3eadce6` |
-| `FADE/fade_siglip_so400m.safetensors` | `d03b6aa280503a20947d8762dca2a1dbd946a54bdd2eef2c9515f0881e0a1a05` |
+| `fade_dinov2_vitl14_reg.safetensors` | `41702efeaa7ec5dc2350173996aefd6ef2805ef063e2af45f72417dcc3eadce6` |
+| `fade_siglip_so400m.safetensors` | `d03b6aa280503a20947d8762dca2a1dbd946a54bdd2eef2c9515f0881e0a1a05` |
 
-The downloaded folder includes `SHA256SUMS` and its license files (`LICENSE.txt`, `LICENSE-APACHE-2.0.txt`).
+The Hugging Face repository also carries the model card and the license files (`LICENSE.txt`, `LICENSE-APACHE-2.0.txt`).
 
 **Model card.**
 

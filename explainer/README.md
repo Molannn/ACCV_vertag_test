@@ -33,31 +33,28 @@ The model runs in bf16 and needs a GPU with about 17 GB of free memory. Use 2 al
 
 | Adapter | Trained with | Paper | |
 |---|---|---|---|
-| `explainer_lora` | the visual-only prompt in `generate.py` (the one used at inference) | Tab. 5, registration-number row | **default** |
-| `explainer_lora_prompt_v0` | an earlier prompt that also asked about pronunciation | Tab. 5, content rows; Suppl. S7 | |
+| [`MrFrogIsMe/vertag-explainer-lora`](https://huggingface.co/MrFrogIsMe/vertag-explainer-lora) | the visual-only prompt in `generate.py` (the one used at inference) | Tab. 5, registration-number row | **default** |
+| [`MrFrogIsMe/vertag-explainer-lora-prompt-v0`](https://huggingface.co/MrFrogIsMe/vertag-explainer-lora-prompt-v0) | an earlier prompt that also asked about pronunciation | Tab. 5, content rows; Suppl. S7 | |
 
-**Download** from [Google Drive](https://drive.google.com/drive/folders/1R6ZYEtCIhNd7nCeh-1Wq9oB0FwGDDels?usp=sharing), in the browser or with `gdown` (this fetches the FADE checkpoints too), and put the adapter folders in `explainer/checkpoints/`:
+Pass an adapter's Hugging Face id with `--adapter`; it is downloaded on first use. Without `--adapter` the base model runs zero-shot. To keep a local copy, download it and pass the folder instead:
 
 ```bash
-pip install "gdown>=6.4,<7"
-gdown --folder https://drive.google.com/drive/folders/1R6ZYEtCIhNd7nCeh-1Wq9oB0FwGDDels -O vertag_models
-(cd vertag_models && sha256sum -c SHA256SUMS)
-mkdir -p checkpoints && cp -r vertag_models/explainer/explainer_lora vertag_models/explainer/explainer_lora_prompt_v0 checkpoints/
+hf download MrFrogIsMe/vertag-explainer-lora --local-dir checkpoints/vertag-explainer-lora
 ```
 
 | File | SHA256 |
 |---|---|
-| `explainer/explainer_lora/adapter_model.safetensors` | `43c8d681f3f822303c885c5b8080a2a54098f5b8d8868ea518d1b6c969ea6597` |
-| `explainer/explainer_lora_prompt_v0/adapter_model.safetensors` | `3a64dfefc1896d851559a14fafd1f7e5e5958fea292832dee961e10549e3da50` |
+| `vertag-explainer-lora/adapter_model.safetensors` | `43c8d681f3f822303c885c5b8080a2a54098f5b8d8868ea518d1b6c969ea6597` |
+| `vertag-explainer-lora-prompt-v0/adapter_model.safetensors` | `3a64dfefc1896d851559a14fafd1f7e5e5958fea292832dee961e10549e3da50` |
 
-The downloaded folder includes `SHA256SUMS` and its license files (`LICENSE.txt`, `LICENSE-APACHE-2.0.txt`). Pass an adapter with `--adapter`; without it the base model runs zero-shot.
+Each Hugging Face repository also carries the model card and the license files (`LICENSE.txt`, `LICENSE-APACHE-2.0.txt`).
 
 **Model card.**
 
 - *Source.* These are the adapter files used in the paper, not retrained ones.
 - *Architecture.* LoRA (r = 16, α = 32) on the q/k/v/o projections of the language model of `Qwen/Qwen2.5-VL-7B-Instruct`; the vision tower (`qkv`/`proj` layers) is unchanged. Applied to the base model in bf16.
 - *Training data.* 6,000 applied → cited pairs from TIPO office actions published up to 2023, with the examiner's similarity paragraph as the target; QLoRA (4-bit), 2 epochs. The paper's evaluation cases are office actions after 2023.
-- *Prompt.* `explainer_lora` was trained with the prompt it is run with. `explainer_lora_prompt_v0` was trained with an earlier prompt that also asked about pronunciation; it is always run with the current visual-only prompt, as in the paper. With images only, the two reach almost the same element recall (0.581 and 0.584); the registration-number grounding (fabrication 100% → 5%) was measured with `explainer_lora`.
+- *Prompt.* `vertag-explainer-lora` was trained with the prompt it is run with. `vertag-explainer-lora-prompt-v0` was trained with an earlier prompt that also asked about pronunciation; it is always run with the current visual-only prompt, as in the paper. With images only, the two reach almost the same element recall (0.581 and 0.584); the registration-number grounding (fabrication 100% → 5%) was measured with `vertag-explainer-lora`.
 - *License.* CC BY-NC 4.0, see [License](#license).
 
 ## 3. Generate
@@ -67,16 +64,16 @@ Pairs go in a JSONL file, one per line: `id`, `applied` and `cited` image paths 
 ```bash
 # 1. images only
 python generate.py --pairs ../FADE/examples/pairs.example.jsonl --image-root /path/to/images \
-    --condition A --adapter checkpoints/explainer_lora
+    --condition A --adapter MrFrogIsMe/vertag-explainer-lora
 
 # 2. images + FADE region evidence, computed in the same run
 python generate.py --pairs ../FADE/examples/pairs.example.jsonl --image-root /path/to/images \
     --condition C --fade-checkpoint ../FADE/checkpoints/fade_dinov2_vitl14_reg.safetensors \
-    --adapter checkpoints/explainer_lora_prompt_v0
+    --adapter MrFrogIsMe/vertag-explainer-lora-prompt-v0
 
 # 3. images + the cited registration number
 python generate.py --pairs ../FADE/examples/pairs.example.jsonl --image-root /path/to/images \
-    --condition C --regno-evidence --adapter checkpoints/explainer_lora
+    --condition C --regno-evidence --adapter MrFrogIsMe/vertag-explainer-lora
 ```
 
 - **Evidence.** With `--fade-checkpoint`, FADE computes the evidence for each pair: the text lists the top 5 patch pairs by $C_{ij}$ and the matched region crops of the top 3 pairs are shown (`--n-crops`). The paper's evidence came from `fade_dinov2_vitl14_reg`. In the paper, region evidence was evaluated with `explainer_lora_prompt_v0` (Tab. 5 content row); `explainer_lora` with region evidence was not evaluated. Evidence computed beforehand with `../FADE/explain.py --evidence-out evidence.json` is read with `--evidence evidence.json` instead.

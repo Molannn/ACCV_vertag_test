@@ -11,11 +11,11 @@ the visual likelihood-of-confusion factors only (appearance, concept, dominant p
           --regno-evidence   the cited mark's registration number (registration-number grounding).
 
     python generate.py --pairs ../FADE/examples/pairs.example.jsonl --image-root IMAGES \
-        --condition A --adapter checkpoints/explainer_lora
+        --condition A --adapter MrFrogIsMe/vertag-explainer-lora
     python generate.py --pairs ../FADE/examples/pairs.example.jsonl --image-root IMAGES \
-        --condition C --regno-evidence --adapter checkpoints/explainer_lora
+        --condition C --regno-evidence --adapter MrFrogIsMe/vertag-explainer-lora
     python generate.py --pairs ../FADE/examples/pairs.example.jsonl --image-root IMAGES --condition C \
-        --fade-checkpoint ../FADE/checkpoints/fade_dinov2_vitl14_reg.safetensors --adapter checkpoints/explainer_lora_prompt_v0
+        --fade-checkpoint ../FADE/checkpoints/fade_dinov2_vitl14_reg.safetensors --adapter MrFrogIsMe/vertag-explainer-lora-prompt-v0
 
 Without the registration number, a fine-tuned adapter almost always writes a fabricated one. The output is
 automatically generated research text, not an examination opinion of TIPO and not legal advice.
