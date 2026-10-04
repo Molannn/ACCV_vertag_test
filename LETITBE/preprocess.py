@@ -13,7 +13,7 @@ Four steps, run in order. Each writes into --data-dir (default ./data).
 
 The source corpus is a JSONL with one object per case:
 
-    {"id": "T0398530", "similarity_text": "<the appearance paragraph>", "date_pub": "2024/01/05"}
+    {"id": "T0398530", "similarity_text": "<the appearance paragraph>", "date_pub": "2019/07/19"}
 
 It is not distributed with this repository. See README.md for how to obtain it.
 

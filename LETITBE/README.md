@@ -26,7 +26,7 @@ LETITBE/
 
 ## 1. Install
 
-Clone the repository as in the [root README](../README.md#installation); every command below runs from `VERTAG/LETITBE`.
+Clone the repository as in the [root README](../README.md#installation).
 
 ```bash
 cd LETITBE
@@ -104,13 +104,13 @@ The released adapters are listed in the root README's [Model Zoo](../README.md#m
 
 ## 5. Build the corpus yourself
 
-The office action corpus, the decomposed corpus and the evaluation sets used in the paper are not distributed here. Everything below assumes you have obtained the source material first.
+Neither the source documents nor the data derived from them are distributed here.
 
-The corpus is built from TIPO refusal dispositions (核駁審定書, `dptKind = REJ`), public administrative dispositions issued by the Taiwan Intellectual Property Office. The collection used in the paper covers examination numbers T0300000 to T0454297 and was retrieved in May and June 2026. We do not provide collection tooling; obtain these documents directly from TIPO.
+**Source documents.** The corpus is built from TIPO refusal dispositions (核駁審定書, `dptKind = REJ`), public administrative dispositions issued by the Taiwan Intellectual Property Office. The collection used in the paper covers examination numbers T0300000 to T0454297 and was retrieved in May and June 2026. We do not redistribute them or provide collection tooling; obtain them directly from TIPO.
 
-**Derived artifacts.** For the decomposed corpus, the gold checklists, or the evaluation subsets used in the paper, write to the [contact address](../README.md#contact) with a short description of your intended use. They are provided under CC BY-NC 4.0.
+**Derived artifacts.** The decomposed corpus, the gold checklists and the evaluation subsets used in the paper are available from the authors on request; write to the [contact address](../README.md#contact) with a short description of your intended use. They are provided under CC BY-NC 4.0.
 
-With the source corpus in hand:
+To rebuild them, run:
 
 ```bash
 python preprocess.py decompose --corpus <corpus.jsonl>   # needs GEMINI_API_KEY
@@ -119,7 +119,7 @@ python preprocess.py build-pairs
 python preprocess.py build-500
 ```
 
-The decomposer is an LLM at temperature 0, not a deterministic parser, so a rerun will not be byte-identical to the checklists used in the paper. Every other step is deterministic.
+The decomposer is an LLM at temperature 0, not a deterministic parser, so a rerun will not be byte-identical to the checklists used in the paper; those are available on request, as above. Every other step is deterministic.
 
 ## 6. Train your own detector
 
