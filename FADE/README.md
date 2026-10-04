@@ -132,7 +132,7 @@ Each model's PCA whitening is fitted on a random sample of 20,000 gallery descri
 
 ## 6. Evaluate on METU-v2
 
-METU-v2 ([Tursun et al., 2017](https://github.com/neouyghur/METU-TRADEMARK-DATASET)) is available from its authors on request.
+METU-v2 ([dataset page](https://github.com/neouyghur/METU-TRADEMARK-DATASET)) is available from its authors on request; cite both [Tursun and Kalkan, MVA 2015](https://doi.org/10.1109/MVA.2015.7153243) and [Tursun et al., arXiv:1701.05766](https://arxiv.org/abs/1701.05766) when you use it.
 
 ```bash
 python evaluate_metu.py --checkpoint checkpoints/fade_dinov2_vitl14_reg.safetensors \
@@ -140,7 +140,7 @@ python evaluate_metu.py --checkpoint checkpoints/fade_dinov2_vitl14_reg.safetens
     --output outputs/metu_dinov2.json
 ```
 
-The 417 queries are injected after the 922,926 gallery images, and a query's relevant set is the other queries of its group (file name `<instance>-<group>.jpg`). The run scores the frozen GeM baseline of the checkpoint's backbone and the checkpoint. The paper reports mAP@100 0.300 → 0.316 for DINOv2-L/14-reg and 0.343 → 0.321 for SigLIP-SO400M (frozen → FADE). `--pool 50000` evaluates on a seeded 50k gallery subset, and `--content-types logo_content_types.txt` adds a per-type breakdown.
+The 417 queries are injected after the 922,926 gallery images, and a query's relevant set is the other queries of its group (file name `<instance>-<group>.jpg`). The run scores the frozen GeM baseline of the checkpoint's backbone and the checkpoint. The paper reports mAP@100 0.300 → 0.316 for DINOv2-L/14-reg on the full gallery (Tab. 3) and 0.639 → 0.641 for SigLIP-SO400M on the seeded 50k gallery subset (Suppl. Tab. S3; frozen → FADE). `--pool 50000` evaluates on that 50k subset, and `--content-types logo_content_types.txt` adds a per-type breakdown.
 
 ## 7. Checkpoint format
 

@@ -24,41 +24,30 @@ Paper (coming soon) · [Benchmark](benchmark/) · [Models](#model-zoo) · [Citat
 
 Trademark examiners justify a likelihood-of-confusion refusal by naming the element that drives the conflict, yet trademark retrieval is evaluated on visual near-duplicates and its explanations are never checked against what examiners recorded. VERTAG grounds retrieval and its explanations in **58,799 office actions of the Taiwan Intellectual Property Office (TIPO)**. Each office action pairs an applied mark with the prior mark(s) it was refused over and states, in prose, why they are confusingly similar, so it supplies three expert ground truths at once: a retrieval label (the cited marks), a localization target (the element the examiner quotes) and a checklist of the reasons the examiner gave.
 
-```mermaid
-flowchart LR
-    OA["TIPO office actions<br/>58,799 refusals"]
-    OA -->|"cited prior marks"| B["C1 · Confusion benchmark"]
-    OA -->|"quoted element (pointing game)"| F["C1 · FADE retriever"]
-    OA -->|"recorded reasons"| L["C3 · LETITBE coverage metric"]
-    B --> F
-    F -->|"region evidence C_ij"| X["C2 · Grounded explanation"]
-    X -->|"candidate rationale"| L
-```
-
 ## Contents
 
 | Directory | Contribution | Released |
 |---|---|---|
-| [`benchmark/`](benchmark/) | **C1** The examiner-confusion retrieval benchmark: 10,215 held-out queries whose relevant items are the prior marks the examiner cited, over an 83,336-mark register (G1) and a ~1M-distractor variant (G2) | query ids, relevance labels, gallery ids |
-| [`FADE/`](FADE/) | **C1** FADE, a faithful additive descriptor whose retrieval cosine decomposes exactly into patch-pair contributions $C_{ij}$ | inference, $C_{ij}$ explanations, benchmark and METU-v2 evaluation |
-| [`explainer/`](explainer/) | **C2** Grounded explanation: Qwen2.5-VL writes examiner-style rationales from the marks and FADE's region evidence | inference |
-| [`LETITBE/`](LETITBE/) | **C3** Explanation-coverage metric grounded in examiner reasoning | scoring, detector evaluation, corpus tools, detector fine-tuning |
+| [`benchmark/`](benchmark/) | The examiner-confusion retrieval benchmark: 10,215 held-out queries whose relevant items are the prior marks the examiner cited, over an 83,336-mark register (G1) and a ~1M-distractor variant (G2) | query ids, relevance labels, gallery ids |
+| [`FADE/`](FADE/) | FADE, a faithful additive descriptor whose retrieval cosine decomposes exactly into patch-pair contributions $C_{ij}$ | inference, $C_{ij}$ explanations, benchmark and METU-v2 evaluation |
+| [`explainer/`](explainer/) | Grounded explanation: Qwen2.5-VL writes examiner-style rationales from the marks and FADE's region evidence | inference |
+| [`LETITBE/`](LETITBE/) | Explanation-coverage metric grounded in examiner reasoning | scoring, detector evaluation, corpus tools, detector fine-tuning |
 
 The training code of FADE and of the explainer is not part of this release.
 
 ## News
 
 - **2026-10** Benchmark labels, FADE and explainer inference code, and the LETITBE metric are released.
-- VERTAG is accepted to **ACCV 2026**.
+- **2026-09** VERTAG is accepted to **ACCV 2026**.
 
 ## Installation
 
 ```bash
-git clone https://github.com/<owner>/<repo>.git VERTAG
+git clone https://github.com/spaces-lalala/VERTAG.git
 cd VERTAG
 ```
 
-Each component has its own requirements (Python 3.10):
+Install each component in its own Python 3.10 environment (see [FAQ](#faq)):
 
 | Component | Install | Hardware |
 |---|---|---|
@@ -68,8 +57,8 @@ Each component has its own requirements (Python 3.10):
 
 ## Data
 
-- **Benchmark labels** are in [`benchmark/`](benchmark/) under CC BY-NC 4.0. They contain only public TIPO identifiers; the mark images are not redistributed and are looked up by registration number and case number in TIPO's official trademark search system (see [`benchmark/README.md`](benchmark/README.md)).
-- **METU-v2** ([Tursun et al., 2017](https://github.com/neouyghur/METU-TRADEMARK-DATASET)) provides the G2 distractors and the near-duplicate benchmark; it is available from its authors on request.
+- **Benchmark labels** are in [`benchmark/`](benchmark/) under CC BY-NC 4.0. They contain only public TIPO identifiers; the mark images are not redistributed, and [`benchmark/README.md`](benchmark/README.md) explains how to obtain them.
+- **METU-v2** ([dataset page](https://github.com/neouyghur/METU-TRADEMARK-DATASET)) provides the G2 distractors and the near-duplicate benchmark; it is available from its authors on request.
 - **The office-action corpus** is not redistributed; see [`LETITBE/README.md`](LETITBE/README.md#5-build-the-corpus-yourself) for the source material and for the derived artifacts.
 
 ## Model Zoo
@@ -82,13 +71,20 @@ Each component has its own requirements (Python 3.10):
 | explainer | LoRA, registration-number row | Qwen2.5-VL-7B-Instruct | Tab. 5 | coming soon |
 | LETITBE | reference engine | Qwen2.5-7B-Instruct, zero-shot | Tab. 6 | via [Ollama](https://ollama.com) (`qwen2.5:7b`) |
 | LETITBE | [`annieyii/letitbe-hitdet-gemma2-9b`](https://huggingface.co/annieyii/letitbe-hitdet-gemma2-9b) | gemma-2-9b-it | Tab. 6 | Hugging Face |
-| LETITBE | [`annieyii/letitbe-hitdet-breeze-7b`](https://huggingface.co/annieyii/letitbe-hitdet-breeze-7b) | Breeze-7B-Instruct-v1_0 | Suppl. S8 | Hugging Face |
+| LETITBE | [`annieyii/letitbe-hitdet-breeze-7b`](https://huggingface.co/annieyii/letitbe-hitdet-breeze-7b) | Breeze-7B-Instruct-v1_0 | Suppl. Tab. S9 | Hugging Face |
 
 The FADE files go in `FADE/checkpoints/`; [`FADE/README.md`](FADE/README.md#2-checkpoints) and [`explainer/README.md`](explainer/README.md#2-adapters) describe them.
 
 ## Quick start
 
-**C1, FADE.** Explain a pair, search a gallery, evaluate on the benchmark ([`FADE/README.md`](FADE/README.md)):
+**Benchmark, no checkpoint needed.** Score a frozen backbone on the examiner-confusion benchmark (image layout in [`FADE/README.md`](FADE/README.md#5-evaluate-on-the-examiner-confusion-benchmark)):
+
+```bash
+cd FADE
+python evaluate.py --backbone dinov2_vitl14_reg --images /path/to/images --output outputs/g1_frozen.json
+```
+
+**FADE.** Explain a pair, search a gallery, evaluate on the benchmark ([`FADE/README.md`](FADE/README.md)):
 
 ```bash
 cd FADE
@@ -99,7 +95,7 @@ python retrieve.py --checkpoint checkpoints/fade_dinov2_vitl14_reg.safetensors \
 python evaluate.py --checkpoint checkpoints/fade_dinov2_vitl14_reg.safetensors --images /path/to/images
 ```
 
-**C2, explainer.** FADE's region evidence first, then the rationale ([`explainer/README.md`](explainer/README.md)):
+**Explainer.** FADE's region evidence first, then the rationale ([`explainer/README.md`](explainer/README.md)):
 
 ```bash
 (cd FADE && python explain.py --checkpoint checkpoints/fade_dinov2_vitl14_reg.safetensors \
@@ -110,28 +106,73 @@ python generate.py --pairs ../FADE/examples/pairs.example.jsonl --image-root /pa
     --condition C --evidence ../FADE/outputs/explain/evidence.json --adapter ADAPTER
 ```
 
-**C3, LETITBE.** Score an explanation against the examiner's reason points ([`LETITBE/README.md`](LETITBE/README.md)):
+**LETITBE.** Score an explanation against the examiner's reason points ([`LETITBE/README.md`](LETITBE/README.md)):
 
 ```bash
 cd LETITBE
 python letitbe.py coverage --input examples/coverage.example.jsonl --engine qwen2.5:7b
 ```
 
-## Results
+## FAQ
 
-Retrieval on the examiner-confusion benchmark (G1: 83,336-mark register; G2: the register within 1,006,262 images; 10,215 queries) and on METU-v2 near-duplicates (922,926 images, 417 queries), from Tab. 3 and 4 of the paper:
+<details>
+<summary>Why one environment per component?</summary>
 
-| Model | Explanation | G1 mAP@100 | G1 R@100 | G1 PRES@100 | G2 R@100 | METU-v2 mAP@100 |
-|---|---|---|---|---|---|---|
-| DINOv2-B/14 (frozen) | – | 0.028 | 0.080 | 0.054 | – | – |
-| DINOv2-L/14-reg GeM (frozen) | – | 0.026 | 0.079 | 0.054 | 0.063 | 0.300 |
-| EVA02-CLIP-L/14 (frozen) | – | 0.173 | 0.445 | 0.330 | – | – |
-| SigLIP-SO400M (frozen) | – | 0.220 | 0.512 | 0.393 | 0.385 | 0.343 |
-| DINOv2-L + FADE | exact $C_{ij}$ | 0.048 | 0.146 | 0.093 | 0.123 | 0.316 |
-| SigLIP + FADE | exact $C_{ij}$ | **0.319** | **0.609** | **0.500** | **0.548** | 0.321 |
+The pinned requirements conflict: FADE and the explainer pin `torch==2.4.1`, LETITBE pins `torch==2.10.0`.
 
-The same trained descriptor barely moves near-duplicate retrieval but roughly doubles examiner-confusion retrieval with DINOv2 (R@100 +85% on G1), and its $C_{ij}$ readout localizes the element the examiner names. With the explainer, region evidence does not raise the element recall of the fine-tuned model, while giving it the cited registration number cuts fabricated registration numbers from 100% to 5% (Tab. 5). LETITBE is the only tested metric that rejects shared boilerplate and drops clearly when the similarity-degree conclusion is removed (0.81 → 0.64, against 1.00 → 0.97 for a holistic LLM judge; Tab. 6).
+```bash
+python3.10 -m venv .venv-fade && source .venv-fade/bin/activate
+pip install -r FADE/requirements.txt
+```
 
+</details>
+
+<details>
+<summary>PyTorch reports that my RTX 50-series GPU (<code>sm_120</code>) is not supported.</summary>
+
+The pinned `torch==2.4.1` (CUDA 12.1) is the environment of the paper's runs (RTX 3090 Ti) and predates NVIDIA Blackwell GPUs. Install a CUDA 12.8 build of torch first, then the remaining requirements without the torch pins:
+
+```bash
+pip install torch torchvision --index-url https://download.pytorch.org/whl/cu128
+grep -v '^torch' FADE/requirements.txt | pip install -r /dev/stdin
+```
+
+</details>
+
+<details>
+<summary>The explainer runs out of GPU memory.</summary>
+
+Qwen2.5-VL-7B in bf16 needs about 17 GB free; a 16 GB card is not enough.
+
+</details>
+
+<details>
+<summary>How do I get the query images? Searching TIPO by <code>case_id</code> finds nothing.</summary>
+
+`case_id` is the examination number of the refusal, not the number of the applied mark, and a refused mark has no registration number. Search by the application number in [`benchmark/query_apply_no.csv`](benchmark/query_apply_no.csv); see [`benchmark/README.md`](benchmark/README.md#obtaining-the-mark-images).
+
+</details>
+
+<details>
+<summary>The FADE checkpoints and explainer adapters are not released yet. What can I run now?</summary>
+
+The frozen baselines on the benchmark (`evaluate.py --backbone ...`, no checkpoint), the zero-shot explainer (omit `--adapter`), and all of LETITBE.
+
+</details>
+
+<details>
+<summary>My benchmark numbers differ from the paper by about 0.001.</summary>
+
+Each model's PCA whitening is fitted on a random gallery sample that depends on what the run did before; see [`FADE/README.md`](FADE/README.md#5-evaluate-on-the-examiner-confusion-benchmark).
+
+</details>
+
+<details>
+<summary>Downloading <code>google/gemma-2-9b-it</code> fails with a 403.</summary>
+
+It is a gated model: accept the Gemma Terms of Use on [its Hugging Face page](https://huggingface.co/google/gemma-2-9b-it) and set `HF_TOKEN` (see [`LETITBE/.env.example`](LETITBE/.env.example)). The Breeze base model is not gated.
+
+</details>
 ## Citation
 
 ```bibtex

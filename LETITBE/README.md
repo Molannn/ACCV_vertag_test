@@ -29,7 +29,7 @@ LETITBE/
 Every command below runs from `VERTAG/LETITBE`.
 
 ```bash
-git clone https://github.com/annieyii/VERTAG.git
+git clone https://github.com/spaces-lalala/VERTAG.git
 cd VERTAG/LETITBE
 pip install openai                  # enough for scoring through Ollama or any OpenAI-compatible API
 pip install -r requirements.txt     # the rest: --backend hf, decompose, fine-tuning
@@ -98,6 +98,8 @@ The released adapters are per-point **classifiers**, not coverage engines; they 
 python letitbe.py detector --input your_pairs.jsonl \
     --backend hf --engine google/gemma-2-9b-it --adapter annieyii/letitbe-hitdet-gemma2-9b
 ```
+
+`google/gemma-2-9b-it` is gated; accept its terms on Hugging Face and set `HF_TOKEN` first ([FAQ](../README.md#faq)).
 
 ### Released adapters
 
