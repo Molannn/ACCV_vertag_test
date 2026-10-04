@@ -193,7 +193,7 @@ def main() -> None:
     from qwen_vl_utils import process_vision_info
     from transformers import AutoProcessor, Qwen2_5_VLForConditionalGeneration
 
-    model = Qwen2_5_VLForConditionalGeneration.from_pretrained(args.model, torch_dtype="auto", device_map="auto")
+    model = Qwen2_5_VLForConditionalGeneration.from_pretrained(args.model, dtype="auto", device_map="auto")
     if args.adapter:
         from peft import PeftModel
         model = PeftModel.from_pretrained(model, args.adapter)

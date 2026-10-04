@@ -130,7 +130,7 @@ pip install -r FADE/requirements.txt
 <details>
 <summary>PyTorch reports that my RTX 50-series GPU (<code>sm_120</code>) is not supported.</summary>
 
-The pinned `torch==2.4.1` (CUDA 12.1) is the environment of the paper's runs (RTX 3090 Ti) and predates NVIDIA Blackwell GPUs. Install a CUDA 12.8 build of torch first, then the remaining requirements without the torch pins:
+This affects FADE and the explainer only; LETITBE's `torch==2.10.0` already supports these GPUs. Their pinned `torch==2.4.1` (CUDA 12.1) is the environment of the paper's runs (RTX 3090 Ti) and predates NVIDIA Blackwell GPUs. Install a CUDA 12.8 build of torch first, then the remaining requirements without the torch pins (same for `explainer/requirements.txt`):
 
 ```bash
 pip install torch torchvision --index-url https://download.pytorch.org/whl/cu128

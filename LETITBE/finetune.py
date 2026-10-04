@@ -97,7 +97,7 @@ def cmd_train(args):
     if tok.pad_token is None:
         tok.pad_token = tok.eos_token
     model = AutoModelForCausalLM.from_pretrained(
-        args.base, quantization_config=bnb, torch_dtype=torch.bfloat16,
+        args.base, quantization_config=bnb, dtype=torch.bfloat16,
         device_map="auto", token=token)
 
     lora = LoraConfig(r=16, lora_alpha=32, lora_dropout=0.05, bias="none",

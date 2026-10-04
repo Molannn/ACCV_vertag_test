@@ -202,7 +202,7 @@ class HfEngine:
         if self.tok.pad_token is None:
             self.tok.pad_token = self.tok.eos_token
         self.model = AutoModelForCausalLM.from_pretrained(
-            model, quantization_config=bnb, torch_dtype=torch.bfloat16,
+            model, quantization_config=bnb, dtype=torch.bfloat16,
             device_map="auto", token=token)
         if adapter:
             from peft import PeftModel
