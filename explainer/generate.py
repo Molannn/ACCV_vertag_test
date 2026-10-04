@@ -157,6 +157,11 @@ def main() -> None:
     if args.condition in ("B", "C") and not (args.evidence or args.regno_evidence):
         ap.error("conditions B/C need --evidence or --regno-evidence")
     ev_index = json.loads(args.evidence.read_text(encoding="utf-8")) if args.evidence else {}
+    if args.evidence:  # crop paths in the index are relative to the evidence file
+        root = args.evidence.parent
+        ev_index = {pid: {**ev, **{k: [str(root / c) for c in ev.get(k, [])]
+                                   for k in ("applied_crops", "cited_crops")}}
+                    for pid, ev in ev_index.items()}
 
     tag = "ft" if args.adapter else "zs"
     out_path = args.output or Path("outputs") / f"rationales_{args.condition}{'_regno' if args.regno_evidence else ''}_{tag}.jsonl"

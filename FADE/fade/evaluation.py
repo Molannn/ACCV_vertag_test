@@ -46,7 +46,8 @@ def encode(paths, fn, tf, device, bs: int = 64, nw: int = 4) -> torch.Tensor:
     """fn: images (B, C, H, W) on device -> descriptors (B, D). Returns (len(paths), D) in path order."""
     out = []
     for idx, imgs in DataLoader(PathListDataset(paths, tf), batch_size=bs, num_workers=nw):
-        out.append((idx, fn(imgs.to(device)).float().cpu()))
+        # clone: a worker's idx tensor holds a shared-memory file descriptor until freed
+        out.append((idx.clone(), fn(imgs.to(device)).float().cpu()))
     emb = torch.empty(len(paths), out[0][1].shape[1])
     for idx, d in out:
         emb[idx] = d

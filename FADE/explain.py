@@ -86,7 +86,9 @@ def main() -> None:
             for k, (ac, cc) in enumerate(zip(ev["applied_crops"], ev["cited_crops"])):
                 p1, p2 = cdir / f"applied_{k}.png", cdir / f"cited_{k}.png"
                 ac.save(p1); cc.save(p2)
-                crops_a.append(str(p1)); crops_c.append(str(p2))
+                # relative to the evidence file, so the index works from any working directory
+                crops_a.append(str(p1.relative_to(args.evidence_out.parent)))
+                crops_c.append(str(p2.relative_to(args.evidence_out.parent)))
             evidence[pid] = {"text": ev["text"], "n_pairs": len(ev["pairs"]),
                              "applied_crops": crops_a, "cited_crops": crops_c,
                              "applied": str(p["applied"]), "cited": str(p["cited"])}

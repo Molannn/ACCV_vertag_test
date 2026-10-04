@@ -20,7 +20,7 @@ from PIL import Image
 from .model import AttnPool, FADE, load_fade
 from .transforms import build_ar_preprocessor, build_transform
 
-# coarse 3x3 region names used in the evidence text given to the explainer (C2): top/bottom, left/right
+# coarse 3x3 region names used in the evidence text given to the explainer: top/bottom, left/right
 _V = ["上", "", "下"]
 _H = ["左", "", "右"]
 
@@ -123,7 +123,7 @@ class Correspondence:
                         min(W, (c + ctx + 1) * cw), min(H, (r + ctx + 1) * ch)))
 
     def evidence_from(self, out: dict, top_k: int = 5, ctx: int = 3) -> dict:
-        """Region evidence for the explainer (C2) from a `cij` result: text + matched region crops.
+        """Region evidence for the explainer from a `cij` result: text + matched region crops.
 
         The text is the exact Traditional Chinese wording the explainer was run with in the paper.
         """
