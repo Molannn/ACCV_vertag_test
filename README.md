@@ -184,9 +184,9 @@ This release builds on [DINOv2](https://github.com/facebookresearch/dinov2), [Si
 
 ## Contact
 
-- Chian-Yu Ye: 111601136@nccu.edu.tw
 - Yi-Chieh Wu: matywu@gmail.com
-
+- Chian-Yu Ye: 111601136@nccu.edu.tw
+  
 ## Copyright and Terms of Use
 
 Copyright (c) 2026 VERTAG authors.
