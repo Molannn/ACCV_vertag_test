@@ -1,13 +1,18 @@
 # Grounded explanation with Qwen2.5-VL-7B-Instruct: `pip install -r requirements.txt` (Python 3.10).
-# The model runs in bf16 and needs a GPU with about 17 GB of free memory (the paper used an RTX 3090 Ti).
+# The model runs in bf16 and needs a GPU with about 17 GB of free memory (the paper used an RTX 3090 Ti);
+# with --fade-checkpoint, FADE runs on the same GPU (fp32 backbone weights: DINOv2-L/14 1.2 GB, SigLIP 1.7 GB).
 #
 # Pinned to the environment of the paper's runs. For a CUDA build on Windows, install torch/torchvision
 # from the PyTorch index first:
 #   pip install torch==2.4.1 torchvision==0.19.1 --index-url https://download.pytorch.org/whl/cu121
 torch==2.4.1
 torchvision==0.19.1
+numpy==1.26.4
 pillow==12.2.0
 transformers==5.12.1
 accelerate==1.14.0
 peft==0.19.1
 qwen-vl-utils==0.0.14
+
+# --fade-checkpoint (FADE region evidence computed in generate.py) also needs:
+safetensors>=0.4

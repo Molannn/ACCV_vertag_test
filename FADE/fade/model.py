@@ -116,6 +116,21 @@ def read_checkpoint(path) -> Tuple[dict, Dict[str, torch.Tensor], str]:
     return cfg, blob["state_dict"], "full"
 
 
+def checkpoint_config(path) -> dict:
+    """The config of a FADE checkpoint (with defaults filled in), without building the model."""
+    path = Path(path)
+    if path.suffix == ".safetensors":
+        from safetensors import safe_open
+        with safe_open(str(path), framework="pt", device="cpu") as f:
+            meta = f.metadata() or {}
+        if "fade_config" not in meta:
+            raise ValueError(f"{path} has no 'fade_config' metadata; is it a FADE checkpoint?")
+        cfg = json.loads(meta["fade_config"])
+    else:
+        cfg = read_checkpoint(path)[0]
+    return {**CONFIG_DEFAULTS, **cfg}
+
+
 def load_fade(path, device=None) -> Tuple[FADE, dict]:
     """Build a FADE encoder from a checkpoint. Returns (encoder in eval mode, config)."""
     cfg, state, fmt = read_checkpoint(path)

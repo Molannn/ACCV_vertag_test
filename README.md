@@ -18,7 +18,7 @@ Paper (coming soon) · [Benchmark](benchmark/) · [Models](#model-zoo) · [Citat
 
 [![ACCV 2026](https://img.shields.io/badge/ACCV-2026-4b44ce.svg)](#citation)
 [![Code: MIT](https://img.shields.io/badge/code-MIT-green.svg)](LICENSE)
-[![Data: CC BY-NC 4.0](https://img.shields.io/badge/data-CC%20BY--NC%204.0-lightgrey.svg)](LICENSE-DATA)
+[![Data & models: CC BY-NC 4.0](https://img.shields.io/badge/data%20%26%20models-CC%20BY--NC%204.0-lightgrey.svg)](LICENSE-DATA)
 
 </div>
 
@@ -39,9 +39,9 @@ flowchart LR
 
 | Directory | Contribution | Released |
 |---|---|---|
-| [`benchmark/`](benchmark/) | **C1** The examiner-confusion retrieval benchmark: 10,215 held-out queries whose relevant items are the prior marks the examiner cited, over an 83,336-mark register (G1) and a ~1M-distractor variant (G2) | query ids, relevance labels, gallery ids |
-| [`FADE/`](FADE/) | **C1** FADE, a faithful additive descriptor whose retrieval cosine decomposes exactly into patch-pair contributions $C_{ij}$ | inference, $C_{ij}$ explanations, benchmark and METU-v2 evaluation |
-| [`explainer/`](explainer/) | **C2** Grounded explanation: Qwen2.5-VL writes examiner-style rationales from the marks and FADE's region evidence | inference |
+| [`benchmark/`](benchmark/) | **C1** The examiner-confusion retrieval benchmark: 10,215 held-out queries whose relevant items are the prior marks the examiner cited, over an 83,336-mark register (G1) and a ~1M-distractor variant (G2) | query ids, relevance labels, gallery ids, a scorer for any model's rankings |
+| [`FADE/`](FADE/) | **C1** FADE, a faithful additive descriptor whose retrieval cosine decomposes exactly into patch-pair contributions $C_{ij}$ | retrieval, $C_{ij}$ explanations, benchmark evaluation, weights |
+| [`explainer/`](explainer/) | **C2** Grounded explanation: Qwen2.5-VL writes examiner-style rationales from the marks and, optionally, FADE's region evidence or the cited registration number | generation, LoRA adapters |
 | [`LETITBE/`](LETITBE/) | **C3** Explanation-coverage metric grounded in examiner reasoning | scoring, detector evaluation, corpus tools, detector fine-tuning |
 
 The training code of FADE and of the explainer is not part of this release.
@@ -54,7 +54,7 @@ The training code of FADE and of the explainer is not part of this release.
 ## Installation
 
 ```bash
-git clone https://github.com/<owner>/<repo>.git VERTAG
+git clone https://github.com/spaces-lalala/VERTAG.git VERTAG
 cd VERTAG
 ```
 
@@ -68,7 +68,7 @@ Each component has its own requirements (Python 3.10):
 
 ## Data
 
-- **Benchmark labels** are in [`benchmark/`](benchmark/) under CC BY-NC 4.0. They contain only public TIPO identifiers; the mark images are not redistributed and are looked up by registration number and case number in TIPO's official trademark search system (see [`benchmark/README.md`](benchmark/README.md)).
+- **Benchmark labels** are in [`benchmark/`](benchmark/) under CC BY-NC 4.0. They contain only public TIPO identifiers; the mark images are not redistributed and are looked up by registration number and rejection-decision number in TIPO's official trademark search system (see [`benchmark/README.md`](benchmark/README.md)).
 - **METU-v2** ([Tursun et al., 2017](https://github.com/neouyghur/METU-TRADEMARK-DATASET)) provides the G2 distractors and the near-duplicate benchmark; it is available from its authors on request.
 - **The office-action corpus** is not redistributed; see [`LETITBE/README.md`](LETITBE/README.md#5-build-the-corpus-yourself) for the source material and for the derived artifacts.
 
@@ -76,39 +76,53 @@ Each component has its own requirements (Python 3.10):
 
 | Component | Model | Base model | Paper | Download |
 |---|---|---|---|---|
-| FADE | `fade_dinov2_vitl14_reg` | DINOv2-L/14-reg | Tab. 3, Fig. 3 | coming soon |
-| FADE | `fade_siglip_so400m` | SigLIP-SO400M/14, 224 px | Tab. 4 | coming soon |
-| explainer | LoRA, content rows | Qwen2.5-VL-7B-Instruct | Tab. 5 | coming soon |
-| explainer | LoRA, registration-number row | Qwen2.5-VL-7B-Instruct | Tab. 5 | coming soon |
+| FADE | `fade_siglip_so400m` (best retriever) | SigLIP-SO400M/14, 224 px | Tab. 4 | [Google Drive][models] |
+| FADE | `fade_dinov2_vitl14_reg` | DINOv2-L/14-reg, 224 px | Tab. 3, Tab. 4, Fig. 3 | [Google Drive][models] |
+| explainer | `explainer_lora` (default) | Qwen2.5-VL-7B-Instruct | Tab. 5 | [Google Drive][models] |
+| explainer | `explainer_lora_prompt_v0` | Qwen2.5-VL-7B-Instruct | Tab. 5, Suppl. S7 | [Google Drive][models] |
 | LETITBE | reference engine | Qwen2.5-7B-Instruct, zero-shot | Tab. 6 | via [Ollama](https://ollama.com) (`qwen2.5:7b`) |
 | LETITBE | [`annieyii/letitbe-hitdet-gemma2-9b`](https://huggingface.co/annieyii/letitbe-hitdet-gemma2-9b) | gemma-2-9b-it | Tab. 6 | Hugging Face |
 | LETITBE | [`annieyii/letitbe-hitdet-breeze-7b`](https://huggingface.co/annieyii/letitbe-hitdet-breeze-7b) | Breeze-7B-Instruct-v1_0 | Suppl. S8 | Hugging Face |
 
-The FADE files go in `FADE/checkpoints/`; [`FADE/README.md`](FADE/README.md#2-checkpoints) and [`explainer/README.md`](explainer/README.md#2-adapters) describe them.
+[models]: https://drive.google.com/drive/folders/1R6ZYEtCIhNd7nCeh-1Wq9oB0FwGDDels?usp=sharing
+
+The FADE and explainer files are the models used in the paper. Download the folder in the browser or with `gdown`, check it against `SHA256SUMS`, and put the FADE files in `FADE/checkpoints/` and the adapter folders in `explainer/checkpoints/`:
+
+```bash
+pip install gdown
+gdown --folder https://drive.google.com/drive/folders/1R6ZYEtCIhNd7nCeh-1Wq9oB0FwGDDels -O vertag_models
+(cd vertag_models && sha256sum -c SHA256SUMS)
+mkdir -p FADE/checkpoints explainer/checkpoints
+cp vertag_models/FADE/*.safetensors FADE/checkpoints/
+cp -r vertag_models/explainer/explainer_lora vertag_models/explainer/explainer_lora_prompt_v0 explainer/checkpoints/
+```
+
+The weights are licensed under CC BY-NC 4.0 and the downloaded folder includes the license files. Model cards (source, training data, architecture) are in [`FADE/README.md`](FADE/README.md#2-models) and [`explainer/README.md`](explainer/README.md#2-adapters).
 
 ## Quick start
 
-**C1, FADE.** Explain a pair, search a gallery, evaluate on the benchmark ([`FADE/README.md`](FADE/README.md)):
+**C1, FADE.** Search a gallery, explain a pair, evaluate on the benchmark ([`FADE/README.md`](FADE/README.md)):
 
 ```bash
 cd FADE
+python retrieve.py --checkpoint checkpoints/fade_siglip_so400m.safetensors \
+    --gallery /path/to/gallery_dir --query query.jpg --explain 3
 python explain.py --checkpoint checkpoints/fade_dinov2_vitl14_reg.safetensors \
     --applied applied.jpg --cited cited.jpg
-python retrieve.py --checkpoint checkpoints/fade_dinov2_vitl14_reg.safetensors \
-    --gallery /path/to/gallery_dir --query query.jpg --explain 3
-python evaluate.py --checkpoint checkpoints/fade_dinov2_vitl14_reg.safetensors --images /path/to/images
+python evaluate.py --checkpoint checkpoints/fade_siglip_so400m.safetensors --images /path/to/images
 ```
 
-**C2, explainer.** FADE's region evidence first, then the rationale ([`explainer/README.md`](explainer/README.md)):
+Rankings from any other model can be scored with [`benchmark/score_run.py`](benchmark/README.md#evaluation).
+
+**C2, explainer.** An examiner-style rationale for a pair, here grounded on the cited registration number ([`explainer/README.md`](explainer/README.md)):
 
 ```bash
-(cd FADE && python explain.py --checkpoint checkpoints/fade_dinov2_vitl14_reg.safetensors \
-    --pairs examples/pairs.example.jsonl --image-root /path/to/images \
-    --evidence-out outputs/explain/evidence.json)
 cd explainer
-python generate.py --pairs ../FADE/examples/pairs.example.jsonl --image-root /path/to/images \
-    --condition C --evidence ../FADE/outputs/explain/evidence.json --adapter ADAPTER
+python generate.py --applied applied.jpg --cited cited.jpg --regno 00820591 \
+    --condition C --regno-evidence --adapter checkpoints/explainer_lora
 ```
+
+Without the registration number, the fine-tuned adapter writes a fabricated one into almost every rationale; FADE region evidence (`--fade-checkpoint`) does not improve the content of its rationales. The output is research text, not an examination opinion of TIPO and not legal advice.
 
 **C3, LETITBE.** Score an explanation against the examiner's reason points ([`LETITBE/README.md`](LETITBE/README.md)):
 
@@ -119,7 +133,7 @@ python letitbe.py coverage --input examples/coverage.example.jsonl --engine qwen
 
 ## Results
 
-Retrieval on the examiner-confusion benchmark (G1: 83,336-mark register; G2: the register within 1,006,262 images; 10,215 queries) and on METU-v2 near-duplicates (922,926 images, 417 queries), from Tab. 3 and 4 of the paper:
+Retrieval on the examiner-confusion benchmark (G1: 83,336-mark register; G2: the register within 1,006,262 images; 10,215 queries) and on METU-v2 near-duplicates (922,926 images, 417 queries), from Tab. 3 and 4 of the paper; the two SigLIP METU-v2 values are from the text of §4.3:
 
 | Model | Explanation | G1 mAP@100 | G1 R@100 | G1 PRES@100 | G2 R@100 | METU-v2 mAP@100 |
 |---|---|---|---|---|---|---|
@@ -157,6 +171,7 @@ Copyright (c) 2026 VERTAG authors.
 
 - **Code**: MIT License. See [LICENSE](LICENSE).
 - **Data artifacts**: Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0). See [LICENSE-DATA](LICENSE-DATA). **Commercial use of the data artifacts is prohibited.**
+- **Model weights** (the released FADE checkpoints and explainer adapters): CC BY-NC 4.0, the same terms as the data artifacts. See [LICENSE-DATA](LICENSE-DATA). **Commercial use of the model weights is prohibited.**
 - **Automated crawling, scraping, or bulk downloading of this repository is prohibited.** This is a condition of access to this repository and does not modify the MIT or CC BY-NC 4.0 grants above.
 - Third-party trademark images and the TIPO office action corpus are **not** redistributed here; a handful of passages are quoted verbatim in the format examples and prompts. Each cited mark is identified by its public registration number and can be looked up in TIPO's official trademark search system.
 
@@ -166,5 +181,6 @@ Copyright (c) 2026 VERTAG authors.
 
 - **程式碼**：MIT 授權，見 [LICENSE](LICENSE)。
 - **資料**：CC BY-NC 4.0 授權，見 [LICENSE-DATA](LICENSE-DATA)。**禁止一切商業使用。**
+- **模型權重**（釋出的 FADE 權重與 explainer adapter）：CC BY-NC 4.0 授權，與資料相同，見 [LICENSE-DATA](LICENSE-DATA)。**禁止一切商業使用。**
 - **禁止對本儲存庫進行自動化爬取、抓取或大量下載**。此為取用本儲存庫之條件，不變更上述 MIT 與 CC BY-NC 4.0 之授權範圍。
 - 本儲存庫**不**散布第三方商標圖樣，亦不散布經濟部智慧財產局核駁審定書語料；格式範例與 prompt 中引用了少數段落原文。每一件引證商標均以其公開註冊號標示，可自智慧局官方商標檢索系統查得。

@@ -2,7 +2,9 @@
 
 For each (applied, cited) pair this writes a figure (default: the region style of the paper's Fig. 3),
 a JSON record (score, completeness residual, top patch pairs, region boxes, evidence text), and, with
---evidence-out, the region evidence (text + crops) consumed by the grounded explainer (../explainer).
+--evidence-out, the region evidence (text + crop PNGs, stored relative to the evidence file) that
+`../explainer/generate.py --evidence` reads. generate.py can also compute the evidence itself
+(--fade-checkpoint).
 
 One pair:
     python explain.py --checkpoint checkpoints/fade_dinov2_vitl14_reg.safetensors \
@@ -86,7 +88,9 @@ def main() -> None:
             for k, (ac, cc) in enumerate(zip(ev["applied_crops"], ev["cited_crops"])):
                 p1, p2 = cdir / f"applied_{k}.png", cdir / f"cited_{k}.png"
                 ac.save(p1); cc.save(p2)
-                crops_a.append(str(p1)); crops_c.append(str(p2))
+                # relative to the evidence file's folder, so the index can be read from any working directory
+                crops_a.append(p1.relative_to(args.evidence_out.parent).as_posix())
+                crops_c.append(p2.relative_to(args.evidence_out.parent).as_posix())
             evidence[pid] = {"text": ev["text"], "n_pairs": len(ev["pairs"]),
                              "applied_crops": crops_a, "cited_crops": crops_c,
                              "applied": str(p["applied"]), "cited": str(p["cited"])}

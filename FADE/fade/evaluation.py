@@ -156,31 +156,3 @@ def score_confusion(q_emb, g_emb, rel_idx_per_q, device, qb: int = 64):
             rec["PRES@1000"] = pres_at(ranks, 1000)
             recs.append(rec)
     return aggregate_metrics(recs), len(recs), recs
-
-
-# ---------------------------------------------------------------- METU-v2 near-duplicate ruler
-
-def eval_metu(emb_pool, emb_q, qgroups, qctypes, device):
-    """METU-v2 protocol: queries are injected after the gallery pool; the relevant set of a query is the
-    other queries of its group; the query itself is masked. Whitening is fitted on up to 20,000 pool
-    descriptors (global torch RNG). Returns overall and per-content-type aggregates plus per-query ranks."""
-    all_emb = torch.cat([emb_pool, emb_q]); P = len(emb_pool); qgi = list(range(P, P + len(emb_q)))
-    samp = emb_pool[torch.randperm(P)[:min(20000, P)]]
-    mu, W = fit_whiten(samp.to(device))
-    w = F.normalize(((all_emb.to(device) - mu) @ W), p=2, dim=1)
-    sim = (w[qgi] @ w.T).float().cpu()
-    recs = {}; per_query = []
-    for i, gi in enumerate(qgi):
-        row = sim[i].clone(); row[gi] = -1e9
-        rel = [qgi[j] for j in range(len(qgi)) if j != i and qgroups[j] == qgroups[i]]
-        if not rel:
-            continue
-        order = row.argsort(descending=True)
-        rp = torch.empty_like(order); rp[order] = torch.arange(len(order))
-        ranks = (rp[torch.tensor(rel)] + 1)
-        recs.setdefault(qctypes[i], []).append(full_metric_record(ranks, len(row)))
-        per_query.append({"type": qctypes[i], "ranks": ranks.tolist(), "n": int(len(row))})
-    allr = [r for v in recs.values() for r in v]
-    agg = lambda rs: {k: float(sum(x[k] for x in rs) / len(rs)) for k in rs[0]}
-    return {"overall": agg(allr), "per_query": per_query,
-            **{t: {**agg(v), "n": len(v)} for t, v in recs.items()}}

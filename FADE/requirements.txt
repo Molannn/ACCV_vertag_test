@@ -9,8 +9,5 @@ numpy==1.26.4
 pillow==12.2.0
 safetensors>=0.4
 
-# SigLIP backbone (siglip_so400m_224) only
+# SigLIP backbone (fade_siglip_so400m)
 transformers==5.12.1
-
-# frozen EVA02-CLIP baseline of Tab. 4 only
-# open-clip-torch>=2.24
