@@ -10,18 +10,28 @@ no office-action text, no personal data.
 |------|------|-------------|
 | `qrels_test.csv` | 10,215 | One held-out query (`>2023`) per row: `case_id, cited_regnos, year`. `cited_regnos` is a `;`-separated list of the prior-mark registration numbers the examiner cited against that application (the relevant set). |
 | `gallery_regnos.txt` | 83,336 | The retrieval gallery: one prior-mark registration number per line. |
+| `query_apply_no.csv` | 10,215 | `case_id, apply_no`: the TIPO application number of each query's applied mark, in the order of `qrels_test.csv`. |
 
-`case_id` is a TIPO application/office-action number; each registration number identifies one prior
-registered mark. The G2 (~1M-distractor) variant additionally injects the METU-v2 gallery; see the paper.
+`case_id` is the TIPO examination number of the refusal (office action), not the number of the applied
+mark itself; `query_apply_no.csv` maps it to the mark's application number. Each registration number
+identifies one prior registered mark. The G2 (~1M-distractor) variant additionally injects the METU-v2
+gallery; see the paper.
 
 ## Obtaining the mark images
 
-The mark images are third-party trademarks and are **not** included in this release. Each mark is
-identified by its public registration number, so **you can look up and download each image yourself
-from TIPO's official trademark search system** (the government's public trademark register): search by
-the registration number in `gallery_regnos.txt`, or by the `case_id` for a query's applied mark, and
-save the displayed mark image. No bulk collection is provided or required — the identifiers here let you
-retrieve exactly the marks the benchmark uses.
+The mark images are third-party trademarks and are **not** included in this release. Every mark is
+identified by a public TIPO number, so **you can look up and download each image yourself from TIPO's
+official trademark search system** (the government's public trademark register, linked from the
+[TIPO trademark site](https://www.tipo.gov.tw/tw/trademarks)):
+
+- a **query** (applied mark): search by its `apply_no` in `query_apply_no.csv`. A refused application
+  was never registered, so it has no registration number, and the `case_id` does not find it;
+- a **gallery** mark (prior mark): search by its registration number in `gallery_regnos.txt`.
+
+TIPO also publishes trademark data, including mark images, through its patent and trademark open data
+service (專利商標開放資料, under 公開資訊 on [tiponet.tipo.gov.tw](https://tiponet.tipo.gov.tw)), which
+offers API access; follow its terms of use. No bulk collection tooling is provided here — the identifiers
+let you retrieve exactly the marks the benchmark uses.
 
 ## Evaluation
 
