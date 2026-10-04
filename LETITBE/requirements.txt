@@ -1,0 +1,29 @@
+# Install everything with `pip install -r requirements.txt`, or just the group you need.
+# Scoring against an OpenAI-compatible endpoint needs only the first line; the rest is for
+# running a model locally.
+
+# letitbe.py --backend api  (OpenAI, or a local Ollama server)
+openai
+
+# letitbe.py --backend hf   (a local 4-bit model, optionally with a LoRA adapter)
+# finetune.py train         (QLoRA fine-tuning)
+#
+# These are the versions the released adapters were trained with, pinned so that a retrain
+# reproduces them. Scoring does not need the exact versions: the detector was verified on
+# transformers 5.17.0 and peft 0.21.0 without incident. Three workarounds in finetune.py
+# exist for version-specific TRL behaviour (see the comments on loss_type and
+# router_aux_loss_coef), so a different TRL is the first thing to suspect if training crashes.
+torch==2.10.0
+transformers==5.12.1
+peft==0.19.1
+trl==1.7.0
+datasets==5.0.0
+tokenizers==0.22.2
+accelerate
+bitsandbytes
+sentencepiece
+protobuf
+
+# preprocess.py decompose   (the LLM decomposer)
+google-genai
+pydantic

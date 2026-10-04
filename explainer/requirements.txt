@@ -1,0 +1,13 @@
+# Grounded explanation with Qwen2.5-VL-7B-Instruct: `pip install -r requirements.txt` (Python 3.10).
+# The model runs in bf16 and needs a GPU with about 17 GB of free memory (the paper used an RTX 3090 Ti).
+#
+# Pinned to the environment of the paper's runs. For a CUDA build on Windows, install torch/torchvision
+# from the PyTorch index first:
+#   pip install torch==2.4.1 torchvision==0.19.1 --index-url https://download.pytorch.org/whl/cu121
+torch==2.4.1
+torchvision==0.19.1
+pillow==12.2.0
+transformers==5.12.1
+accelerate==1.14.0
+peft==0.19.1
+qwen-vl-utils==0.0.14

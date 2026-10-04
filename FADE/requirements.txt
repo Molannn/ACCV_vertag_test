@@ -1,0 +1,16 @@
+# FADE inference and evaluation: `pip install -r requirements.txt` (Python 3.10).
+#
+# Pinned to the environment that produced the paper's numbers (CUDA 12.1 builds of torch/torchvision on
+# an RTX 3090 Ti). For a CUDA build on Windows, install torch/torchvision from the PyTorch index first:
+#   pip install torch==2.4.1 torchvision==0.19.1 --index-url https://download.pytorch.org/whl/cu121
+torch==2.4.1
+torchvision==0.19.1
+numpy==1.26.4
+pillow==12.2.0
+safetensors>=0.4
+
+# SigLIP backbone (siglip_so400m_224) only
+transformers==5.12.1
+
+# frozen EVA02-CLIP baseline of Tab. 4 only
+# open-clip-torch>=2.24

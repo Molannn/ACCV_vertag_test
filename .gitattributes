@@ -1,0 +1,12 @@
+# Text is stored and checked out with LF on every OS.
+* text=auto eol=lf
+
+# The benchmark label files are kept byte-identical to the release in the paper's supplementary
+# material, which has CRLF line endings.
+/benchmark/qrels_test.csv -text
+/benchmark/gallery_regnos.txt -text
+
+*.png binary
+*.jpg binary
+*.pdf binary
+*.safetensors binary
