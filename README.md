@@ -70,8 +70,8 @@ Install each component in its own Python 3.10 environment (see [FAQ](#faq)):
 | explainer | LoRA, content rows | Qwen2.5-VL-7B-Instruct | Tab. 5 | coming soon |
 | explainer | LoRA, registration-number row | Qwen2.5-VL-7B-Instruct | Tab. 5 | coming soon |
 | LETITBE | reference engine | Qwen2.5-7B-Instruct, zero-shot | Tab. 6 | via [Ollama](https://ollama.com) (`qwen2.5:7b`) |
-| LETITBE | [`annieyii/letitbe-hitdet-gemma2-9b`](https://huggingface.co/annieyii/letitbe-hitdet-gemma2-9b) | gemma-2-9b-it | Tab. 6 | Hugging Face |
-| LETITBE | [`annieyii/letitbe-hitdet-breeze-7b`](https://huggingface.co/annieyii/letitbe-hitdet-breeze-7b) | Breeze-7B-Instruct-v1_0 | Suppl. Tab. S9 | Hugging Face |
+| LETITBE | `letitbe-hitdet-gemma2-9b` | gemma-2-9b-it | Tab. 6 | [Hugging Face](https://huggingface.co/annieyii/letitbe-hitdet-gemma2-9b) |
+| LETITBE | `letitbe-hitdet-breeze-7b` | Breeze-7B-Instruct-v1_0 | Suppl. Tab. S9 | [Hugging Face](https://huggingface.co/annieyii/letitbe-hitdet-breeze-7b) |
 
 The FADE files go in `FADE/checkpoints/`; [`FADE/README.md`](FADE/README.md#2-checkpoints) and [`explainer/README.md`](explainer/README.md#2-adapters) describe them.
 
