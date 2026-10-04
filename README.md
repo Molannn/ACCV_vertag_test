@@ -199,7 +199,6 @@ Copyright (c) 2026 VERTAG authors.
 
 - **Code**: MIT License. See [LICENSE](LICENSE).
 - **Data artifacts**: Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0). See [LICENSE-DATA](LICENSE-DATA). **Commercial use of the data artifacts is prohibited.**
-- **Automated crawling, scraping, or bulk downloading of this repository is prohibited.** This is a condition of access to this repository and does not modify the MIT or CC BY-NC 4.0 grants above.
 - Third-party trademark images and the TIPO office action corpus are **not** redistributed here; a handful of passages are quoted verbatim in the format examples and prompts. Each cited mark is identified by its public registration number and can be looked up in TIPO's official trademark search system.
 
 ## 著作權與使用條款
@@ -208,5 +207,4 @@ Copyright (c) 2026 VERTAG authors.
 
 - **程式碼**：MIT 授權，見 [LICENSE](LICENSE)。
 - **資料**：CC BY-NC 4.0 授權，見 [LICENSE-DATA](LICENSE-DATA)。**禁止一切商業使用。**
-- **禁止對本儲存庫進行自動化爬取、抓取或大量下載**。此為取用本儲存庫之條件，不變更上述 MIT 與 CC BY-NC 4.0 之授權範圍。
 - 本儲存庫**不**散布第三方商標圖樣，亦不散布經濟部智慧財產局核駁審定書語料；格式範例與 prompt 中引用了少數段落原文。每一件引證商標均以其公開註冊號標示，可自智慧局官方商標檢索系統查得。

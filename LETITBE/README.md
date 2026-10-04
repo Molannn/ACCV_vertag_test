@@ -147,4 +147,4 @@ python finetune.py train --base google/gemma-2-9b-it --out models/hitdet_gemma \
 
 ## License
 
-See the [root README](../README.md). Code is MIT, data artifacts are CC BY-NC 4.0, commercial use of the data is prohibited, and automated crawling of this repository is prohibited. The released adapters are not covered by either license; each inherits its base model's terms.
+See the [root README](../README.md). Code is MIT, data artifacts are CC BY-NC 4.0, and commercial use of the data is prohibited. The released adapters are not covered by either license; each inherits its base model's terms.
