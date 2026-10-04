@@ -52,7 +52,7 @@ Both expose the exact $C_{ij}$ decomposition. The retrieval and evaluation examp
 **Download** from [Google Drive](https://drive.google.com/drive/folders/1R6ZYEtCIhNd7nCeh-1Wq9oB0FwGDDels?usp=sharing), in the browser or with `gdown` (this fetches the explainer adapters too), and put the two files in `FADE/checkpoints/`:
 
 ```bash
-pip install gdown
+pip install "gdown>=6.4,<7"
 gdown --folder https://drive.google.com/drive/folders/1R6ZYEtCIhNd7nCeh-1Wq9oB0FwGDDels -O vertag_models
 (cd vertag_models && sha256sum -c SHA256SUMS)
 mkdir -p checkpoints && cp vertag_models/FADE/*.safetensors checkpoints/

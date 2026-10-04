@@ -16,7 +16,7 @@ The explanation module of VERTAG (ACCV 2026). Given an applied mark and a cited 
 | 2. Images + FADE region evidence | the images, FADE's $C_{ij}$ correspondence text for the top 5 patch pairs, and the matched region crops of the top 3 | `--condition C --fade-checkpoint ...` |
 | 3. Images + registration number | the images and the cited mark's registration number | `--condition C --regno-evidence` |
 
-The paper compares these inputs on 500 held-out cases (Tab. 5). Region evidence leaves the content of the fine-tuned model's rationales unchanged or slightly worse, while the registration number removes most fabricated numbers at no cost in content. This directory contains the generation code; the training code and the evaluation data, which come from the office-action corpus, are not distributed.
+The paper compares these inputs on 500 held-out cases (Tab. 5). Region evidence makes the content of the fine-tuned model's rationales slightly worse (element recall 0.584 → 0.559), while the registration number removes most fabricated numbers at no cost in content. This directory contains the generation code; the training code and the evaluation data, which come from the office-action corpus, are not distributed.
 
 ## 1. Install
 
@@ -39,7 +39,7 @@ The model runs in bf16 and needs a GPU with about 17 GB of free memory. Use 2 al
 **Download** from [Google Drive](https://drive.google.com/drive/folders/1R6ZYEtCIhNd7nCeh-1Wq9oB0FwGDDels?usp=sharing), in the browser or with `gdown` (this fetches the FADE checkpoints too), and put the adapter folders in `explainer/checkpoints/`:
 
 ```bash
-pip install gdown
+pip install "gdown>=6.4,<7"
 gdown --folder https://drive.google.com/drive/folders/1R6ZYEtCIhNd7nCeh-1Wq9oB0FwGDDels -O vertag_models
 (cd vertag_models && sha256sum -c SHA256SUMS)
 mkdir -p checkpoints && cp -r vertag_models/explainer/explainer_lora vertag_models/explainer/explainer_lora_prompt_v0 checkpoints/
@@ -72,14 +72,14 @@ python generate.py --pairs ../FADE/examples/pairs.example.jsonl --image-root /pa
 # 2. images + FADE region evidence, computed in the same run
 python generate.py --pairs ../FADE/examples/pairs.example.jsonl --image-root /path/to/images \
     --condition C --fade-checkpoint ../FADE/checkpoints/fade_dinov2_vitl14_reg.safetensors \
-    --adapter checkpoints/explainer_lora
+    --adapter checkpoints/explainer_lora_prompt_v0
 
 # 3. images + the cited registration number
 python generate.py --pairs ../FADE/examples/pairs.example.jsonl --image-root /path/to/images \
     --condition C --regno-evidence --adapter checkpoints/explainer_lora
 ```
 
-- **Evidence.** With `--fade-checkpoint`, FADE computes the evidence for each pair: the text lists the top 5 patch pairs by $C_{ij}$ and the matched region crops of the top 3 pairs are shown (`--n-crops`). The paper's evidence came from `fade_dinov2_vitl14_reg`. Evidence computed beforehand with `../FADE/explain.py --evidence-out evidence.json` is read with `--evidence evidence.json` instead.
+- **Evidence.** With `--fade-checkpoint`, FADE computes the evidence for each pair: the text lists the top 5 patch pairs by $C_{ij}$ and the matched region crops of the top 3 pairs are shown (`--n-crops`). The paper's evidence came from `fade_dinov2_vitl14_reg`. In the paper, region evidence was evaluated with `explainer_lora_prompt_v0` (Tab. 5 content row); `explainer_lora` with region evidence was not evaluated. Evidence computed beforehand with `../FADE/explain.py --evidence-out evidence.json` is read with `--evidence evidence.json` instead.
 - **Registration number.** `--regno-evidence` takes it from the pair's `regno` field, or else from the first run of 5 to 8 digits in the cited image's file name; a pair without one stops the run.
 - Give exactly one evidence source with `--condition C`. The three inputs were evaluated separately; combinations were not.
 - A pair whose evidence is missing, or whose image or crop cannot be opened, stops the run with an error.

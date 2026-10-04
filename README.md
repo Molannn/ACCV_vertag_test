@@ -89,7 +89,7 @@ Each component has its own requirements (Python 3.10):
 The FADE and explainer files are the models used in the paper. Download the folder in the browser or with `gdown`, check it against `SHA256SUMS`, and put the FADE files in `FADE/checkpoints/` and the adapter folders in `explainer/checkpoints/`:
 
 ```bash
-pip install gdown
+pip install "gdown>=6.4,<7"
 gdown --folder https://drive.google.com/drive/folders/1R6ZYEtCIhNd7nCeh-1Wq9oB0FwGDDels -O vertag_models
 (cd vertag_models && sha256sum -c SHA256SUMS)
 mkdir -p FADE/checkpoints explainer/checkpoints
