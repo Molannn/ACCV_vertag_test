@@ -231,7 +231,7 @@ FLIP_APP = [("相彷彿", "不相彷彿"), ("相雷同", "不相雷同"), ("極�
             ("高度近似", "不近似"), ("近似", "不近似")]
 
 # Boilerplate negatives: the candidate only recites the standard framing about how similarity
-# is assessed and makes no judgement about the given claim, so the label is 否. This teaches the
+# is assessed and makes no judgment about the given claim, so the label is 否. This teaches the
 # detector that reciting procedure is not asserting a reason. Variants are cycled deterministically.
 BOILER_VARS = [
     BOILER,                                          # the same text `letitbe.py qualify` scores
@@ -274,7 +274,7 @@ def hard_neg(p, R, pool, start=0):
         h = _flip(claim, FLIP_CONC)
         if h:
             return h, "flip"
-    if a == "外觀":                                  # flip the appearance judgement
+    if a == "外觀":                                  # flip the appearance judgment
         h = _flip(claim, FLIP_APP)
         if h:
             return h, "flip"

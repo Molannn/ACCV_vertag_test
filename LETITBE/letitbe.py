@@ -9,7 +9,7 @@ Two tasks, one engine layer.
 `coverage` scores candidate explanations: for each gold reason point it asks the engine one
 yes/no question, and a case's coverage is the fraction of its points the candidate entails.
 `detector` evaluates the engine itself on labelled candidate-claim pairs and reports
-precision, recall and F1, broken down by how each negative was constructed.
+overall precision, recall and F1, and accuracy for each pair type.
 
 `qualify` decides whether an engine may be used at all, by scoring five candidates of known
 relative quality per case and checking the result against a published gate.
@@ -154,8 +154,7 @@ class ApiEngine:
 
     def _one(self, prompt):
         for i in range(self.retries):
-            # Greedy, to match the hf backend's do_sample=False. A metric that returns a
-            # different score for the same input on a second run is not a metric.
+            # Greedy, to match the hf backend's do_sample=False.
             kw = {} if self.temperature is None else {"temperature": self.temperature}
             try:
                 r = self.client.chat.completions.create(

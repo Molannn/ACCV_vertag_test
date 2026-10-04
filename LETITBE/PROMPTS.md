@@ -56,8 +56,8 @@ Run once, offline, when a corpus is built, at temperature 0 with the aspect fiel
 enum by a response schema so the model cannot invent a label. Its output is the frozen gold
 checklist. Defined in `preprocess.py` as `PROMPT`.
 
-The paper treats the decomposition as part of the dataset definition rather than a variable, so
-it is not ablated. Re-running it with a different model, or at a different temperature, produces
+The decomposition is part of the dataset definition rather than a variable, so it is not
+ablated. Re-running it with a different model, or at a different temperature, produces
 a different dataset, and the audit figures reported for the published checklists do not carry
 over to it.
 

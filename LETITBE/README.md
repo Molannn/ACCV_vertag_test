@@ -26,11 +26,10 @@ LETITBE/
 
 ## 1. Install
 
-Every command below runs from `VERTAG/LETITBE`.
+Clone the repository as in the [root README](../README.md#installation); every command below runs from `VERTAG/LETITBE`.
 
 ```bash
-git clone https://github.com/spaces-lalala/VERTAG.git
-cd VERTAG/LETITBE
+cd LETITBE
 pip install openai                  # enough for scoring through Ollama or any OpenAI-compatible API
 pip install -r requirements.txt     # the rest: --backend hf, decompose, fine-tuning
 ```
@@ -78,11 +77,11 @@ To evaluate a detector rather than score explanations, give it labelled candidat
 python letitbe.py detector --input examples/detector.example.jsonl --engine qwen2.5:7b
 ```
 
-It reports precision, recall and F1 broken down by how each negative was built. Accuracy on `hard_neg` is the primary diagnostic: a detector that matches on surface overlap accepts polarity flips and scores near zero there.
+It reports overall precision, recall and F1, and accuracy for each pair type. Accuracy on `hard_neg` is the primary diagnostic: a detector that matches on surface overlap accepts polarity flips and scores near zero there.
 
 ## 4. Choose an engine
 
-Use **`Qwen2.5-7B-Instruct` zero-shot**, the reference engine behind the paper's coverage figures. Any other engine must first pass the qualification gate: **boilerplate coverage no higher than 0.05, and a strictly monotone decline across full, ablate-1, ablate-half and wrong.**
+Use **`Qwen2.5-7B-Instruct` zero-shot**, the reference engine behind the paper's coverage scores. Any other engine must first pass the qualification gate: **boilerplate coverage no higher than 0.05, and a strictly monotone decline across full, ablate-1, ablate-half and wrong.**
 
 ```bash
 python letitbe.py qualify --input your_gold.jsonl --engine <engine>
@@ -101,26 +100,15 @@ python letitbe.py detector --input your_pairs.jsonl \
 
 `google/gemma-2-9b-it` is gated; accept its terms on Hugging Face and set `HF_TOKEN` first ([FAQ](../README.md#faq)).
 
-### Released adapters
-
-| Adapter | Base model |
-|---|---|
-| [`annieyii/letitbe-hitdet-gemma2-9b`](https://huggingface.co/annieyii/letitbe-hitdet-gemma2-9b) | `google/gemma-2-9b-it` |
-| [`annieyii/letitbe-hitdet-breeze-7b`](https://huggingface.co/annieyii/letitbe-hitdet-breeze-7b) | `MediaTek-Research/Breeze-7B-Instruct-v1_0` |
-
-Each model card on Hugging Face carries the prompt format, measurements, training setup and license. An adapter is **not** covered by this repository's licenses: each inherits its base model's terms, and for `gemma-2-9b` that means the Gemma Terms of Use.
+The released adapters are listed in the root README's [Model Zoo](../README.md#model-zoo). Each model card on Hugging Face carries the prompt format, measurements, training setup and license. An adapter is **not** covered by this repository's licenses: each inherits its base model's terms, and for `gemma-2-9b` that means the Gemma Terms of Use.
 
 ## 5. Build the corpus yourself
 
-The trademark images, the office action corpus, the decomposed corpus and the evaluation sets used in the paper are not distributed here. Everything below assumes you have obtained the source material first.
+The office action corpus, the decomposed corpus and the evaluation sets used in the paper are not distributed here. Everything below assumes you have obtained the source material first.
 
-The corpus is built from TIPO rejection dispositions (核駁審定書, `dptKind = REJ`), public administrative dispositions issued by the Taiwan Intellectual Property Office. The collection used in the paper covers examination numbers T0300000 to T0454297 and was retrieved in May and June 2026.
+The corpus is built from TIPO refusal dispositions (核駁審定書, `dptKind = REJ`), public administrative dispositions issued by the Taiwan Intellectual Property Office. The collection used in the paper covers examination numbers T0300000 to T0454297 and was retrieved in May and June 2026. We do not provide collection tooling; obtain these documents directly from TIPO.
 
-**Trademark images.** Marks are identified by their public registration numbers. TIPO publishes mark images through its patent and trademark open data service and its official trademark search system; look up a registration number there and save the image you need. We do not mirror, bulk-distribute, or provide collection tooling for these images.
-
-**Office action documents.** These are public administrative dispositions issued by TIPO. We do not redistribute the corpus and we do not provide collection tooling for it. Users must obtain these documents directly from TIPO.
-
-**Derived artifacts.** For the decomposed corpus, the gold checklists, or the evaluation subsets used in the paper, contact **matywu@gmail.com** with a short description of your intended use. These are released under CC BY-NC 4.0 and may not be used commercially.
+**Derived artifacts.** For the decomposed corpus, the gold checklists, or the evaluation subsets used in the paper, write to the [contact address](../README.md#contact) with a short description of your intended use. They are provided under CC BY-NC 4.0.
 
 With the source corpus in hand:
 
@@ -147,4 +135,4 @@ python finetune.py train --base google/gemma-2-9b-it --out models/hitdet_gemma \
 
 ## License
 
-See the [root README](../README.md). Code is MIT, data artifacts are CC BY-NC 4.0, commercial use of the data is prohibited, and automated crawling of this repository is prohibited. The released adapters are not covered by either license; each inherits its base model's terms.
+See [Copyright and Terms of Use](../README.md#copyright-and-terms-of-use) in the root README.

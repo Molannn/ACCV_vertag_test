@@ -2,7 +2,7 @@
 
 Two JSONL formats, one per task. Each file here holds five real records, enough to show the shape of the data and nothing more. See the [LETITBE README](../README.md) for how to obtain a full corpus.
 
-The `cand` fields in these examples quote passages of TIPO rejection dispositions verbatim. Those are public administrative dispositions, and these five records are included to illustrate the format, not as a dataset.
+The `cand` fields in these examples quote passages of TIPO refusal dispositions verbatim.
 
 ## `coverage.example.jsonl` — scoring an explanation
 
@@ -50,7 +50,7 @@ One record per candidate-claim pair. This is the input to detector evaluation: d
 | `easy_neg` | `false` | A claim taken from a different case, so it is unrelated to `cand` |
 | `hard_neg` | `false` | A polarity flip or element swap of a true claim, such as 應屬**不**構成近似之商標 or 整體外觀予人寓目印象極**不**相彷彿 |
 
-Hard negatives are the point of the set. A metric that matches on surface overlap will accept a polarity flip, because a flipped claim shares almost every character with the true one. The two hard negatives here read as near-copies of claims the examiner did make, with the conclusion reversed.
+Hard negatives are the point of the set. A metric that matches on surface overlap will accept a polarity flip, because a flipped claim shares almost every character with the true one. The two hard negatives here read as near-copies of claims the examiner did make, with the judgment reversed.
 
 ```json
 {"id": "T0434704",
